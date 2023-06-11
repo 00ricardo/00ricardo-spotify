@@ -1,0 +1,158 @@
+:root {
+    --spotify-grey: #a7a7a7;
+    --spotify-white: #fff;
+    --spotify-green: #1cc558;
+    --spotify-blue: #457fc3;
+    --spotify-black: #000;
+    --spotify-container1: #121212;
+    --spotify-container2: #171717;
+    --spotify-container3: #2a2a2a;
+    --spotify-container4: #414141;
+}
+
+body {
+    background-color: var(--spotify-black);
+    font-family: 'system-ui'
+}
+
+.background {
+    height: 97vh;
+    overflow: hidden;
+}
+
+.container-1 {
+    background-color: var(--spotify-container1);
+}
+
+.container-2 {
+    background-color: var(--spotify-container2);
+
+}
+
+.container-3 {
+    background-color: var(--spotify-container3);
+}
+
+.container-4 {
+    background-color: var(--spotify-container4);
+}
+
+.native-navigation,
+.side-spotify {
+    display: flex;
+    flex-direction: column;
+    color: var(--spotify-grey);
+    height: 115px;
+    width: 385px;
+    min-width: 385px;
+    border-radius: 10px;
+    justify-content: space-around;
+    padding-left: 20px;
+    margin: 0px 8px 8px 0px;
+}
+
+.side-spotify {
+    justify-content: space-between;
+}
+
+
+.navigation-items {
+    display: flex;
+    align-items: center;
+}
+
+.side-spotify {
+    height: 70vh;
+}
+
+.playbar {
+    height: 72px;
+    min-height: 72px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background-color: var(--spotify-black);
+}
+
+.spotify {
+    margin-bottom: 8px;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.song {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 15px;
+}
+
+
+.like-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    display: inline;
+    text-align: left;
+}
+
+.song-like {
+    display: flex;
+    margin-left: 10px;
+    align-items: center;
+}
+
+.like-btn:hover,
+.like-btn:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+.pb1,
+.pb2,
+.pb3 {
+    display: flex;
+}
+
+.pb1 {
+    margin-left: 8px;
+}
+
+.pb3 {
+    margin-right: 8px;
+}
+
+.pb2,
+.pb3 {
+    display: flex;
+    align-items: center;
+    color: var(--spotify-white);
+}
+
+.pb2 {
+    font-size: small;
+}
+
+.player-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.list-filters {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 20px;
+}
+
+.track-list {
+    overflow: auto;
+}
