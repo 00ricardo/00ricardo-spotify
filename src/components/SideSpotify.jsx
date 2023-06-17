@@ -2,25 +2,32 @@
 import React, { useRef, useState } from 'react'
 import { Layers, Add, ArrowForward, Search } from '@mui/icons-material';
 import {
-    Chip, ListItem, ListItemButton, ListItemText,
+    Chip, ListItem, ListItemButton,
     TextField, InputAdornment,
-    Select, FormControl
+    Select, FormControl, Avatar
 } from '@mui/material';
-import { FixedSizeList } from 'react-window';
+import rutils from '00ricardo-utils'
+
 function SideSpotify() {
     const [activateShadow, setActivateShadow] = useState(false)
     const [showSearchInput, setShowSearchInput] = useState(false)
     const filters = ['Recentes', 'Adicionados recentemente', 'Ordem alfabética', 'Criador']
     const trackListRef = useRef(null);
+    const playlists = [{ name: 'Musicas curtidas', type: 'Playlist', owner: 'Ricardo' },
+    { name: 'Runaljod', type: 'Album', owner: 'Wardruna' },
+    { name: 'Spheres', type: 'Playlist', owner: 'Ricardo' },
+    { name: 'Ed Steele', type: 'Artista', owner: '' },
+    { name: 'Three Days Grace', type: 'Artista', owner: '' },
+    { name: 'Progressive Techno V1', type: 'Playlist', owner: 'Ricardo' },
+    { name: 'Progressive Techno V2', type: 'Playlist', owner: 'Ricardo' },]
+
     const handleShadowBox = (e) => {
         const tlRef = trackListRef.current;
-        setActivateShadow(!(tlRef.scrollTop === 0))
+        setActivateShadow(tlRef.scrollTop !== 0)
     }
-    function renderSongs(props) {
-        const { data, index } = props
-        console.log(data)
+    function renderSongs(song, index) {
         return (
-            <ListItem component="div" disablePadding >
+            <ListItem component="div" disablePadding key={index}>
                 {index === 0 ?
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                         {showSearchInput ? <TextField
@@ -37,15 +44,27 @@ function SideSpotify() {
                         /> : <Search />}
 
                         <FormControl size="small">
-                            <Select native defaultValue="Recentes" style={{ color: 'var(--spotify-grey)', backgroundColor: 'var(--spotify-container1)' }}>
-                                <optgroup label="Classificado por" style={{ color: 'var(--spotify-grey)', backgroundColor: 'var(--spotify-container3)' }}>
+                            <Select
+                                native
+                                defaultValue="Recentes"
+                                style={{
+                                    color: 'var(--spotify-grey)',
+                                    backgroundColor: 'var(--spotify-container1)'
+                                }}>
+                                <optgroup
+                                    label="Classificado por"
+                                    style={{
+                                        color: 'var(--spotify-grey)',
+                                        backgroundColor: 'var(--spotify-container3)',
+                                        fontSize: 'small'
+                                    }}>
                                     {filters.map((f, i) => (
                                         <option
                                             key={i}
                                             value={f}
                                             style={{
-                                                color: 'var(--spotify-grey)',
-                                                backgroundColor: 'var(--spotify-container3)'
+                                                color: 'var(--spotify-white)',
+                                                backgroundColor: 'var(--spotify-container3)',
                                             }}>{f} </option>
                                     ))}
                                 </optgroup>
@@ -53,10 +72,40 @@ function SideSpotify() {
                         </FormControl>
                     </div>
                     : <>
-                        <ListItemButton style={{ height: '70px' }}>
-                            sss
-                            <ListItemText primary={`Item `} />
-                            s
+                        <ListItemButton
+                            className='playlist-item'
+                            style={{
+                                flexDirection: 'row',
+                                padding: 0,
+                            }}>
+                            <Avatar
+                                style={{
+                                    height: '57px',
+                                    width: '57px',
+                                    borderRadius: '5px'
+                                }}
+                                variant='square'
+                                src="https://upload.wikimedia.org/wikipedia/commons/3/37/Music_Of_The_Spheres_%28Album%29_2021.jpg"
+                            />
+                            <div
+                                className='playlist-item'
+                                style={{
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    paddingLeft: '15px'
+                                }}
+                            >
+                                {song.name}
+                                <ListItem
+                                    style={{
+                                        padding: '0px',
+                                        color: 'var(--spotify-grey)',
+                                        fontWeight: 'initial'
+                                    }}>
+                                    {rutils.hasValue(song.owner) ? `${song.type} • ${song.owner}` : ''}
+                                </ListItem>
+                            </div>
+
                         </ListItemButton>
                     </>
                 }
@@ -89,15 +138,7 @@ function SideSpotify() {
                 </div>
             </div>
             <div ref={trackListRef} className='track-list' onScroll={(e) => handleShadowBox(e)}>
-                <FixedSizeList
-                    height={400}
-                    itemSize={80}
-                    itemCount={2000000000}
-                    itemData={[]}
-                >
-                    {renderSongs}
-                </FixedSizeList>
-
+                {playlists.map((playlist, idx) => renderSongs(playlist, idx))}
             </div>
         </div>
     )

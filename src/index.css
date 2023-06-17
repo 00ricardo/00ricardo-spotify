@@ -8,6 +8,7 @@
     --spotify-container2: #171717;
     --spotify-container3: #2a2a2a;
     --spotify-container4: #414141;
+    --spotify-default-blue: #0b195b;
 }
 
 body {
@@ -66,8 +67,6 @@ body {
 }
 
 .playbar {
-    height: 72px;
-    min-height: 72px;
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -80,6 +79,9 @@ body {
     margin-bottom: 8px;
     border-radius: 10px;
     width: 100%;
+    overflow: auto;
+    height: 630px;
+
 }
 
 .song {
@@ -155,4 +157,34 @@ body {
 
 .track-list {
     overflow: auto;
+}
+
+.playlist-item {
+    height: 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    color: var(--spotify-white);
+    font-weight: bold;
+}
+
+.header {
+    background: linear-gradient(180deg, rgba(12, 27, 96, 1) 0%, rgba(8, 17, 60, 1) 100%, rgba(5, 13, 46, 1) 100%);
+    height: 325px;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 23px;
+    padding-left: 23px;
+    color: var(--spotify-white);
+}
+
+.spotify-container {
+    background: linear-gradient(180deg, rgba(5, 13, 46, 1) 0%, rgba(18, 18, 18, 1) 10%);
+}
+
+.spotify-main-controlers {
+    padding-left: 23px;
+    padding-top: 23px;
+    display: flex;
+    align-items: center;
 }
