@@ -10,7 +10,7 @@ import {
 export default function Player() {
     const [songTimeProgress, setSongTimeProgress] = useState(0);
     const [songTime, setSongTime] = useState(0);
-    const [songTimeMax, setSongTimeMax] = useState(3); // dummy example 03:23
+    const [songTimeMax, setSongTimeMax] = useState(150); // dummy example 03:23
     const [songTimeParser, setSongTimeParser] = useState('00:00')
 
     const runSongTimer = () => {
