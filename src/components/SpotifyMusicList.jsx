@@ -6,7 +6,6 @@ import {
 } from '@mui/material';
 import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Audio } from 'react-loader-spinner'
-import rutils from '00ricardo-utils'
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
     const [playingIconOnHover, setPlayingIconOnHover] = useState(false)
@@ -29,7 +28,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     function createData(id, name, code, population) {
         return {
             '#': id,
-            titulo:
+            title:
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Avatar
                         style={{
@@ -55,15 +54,15 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                         </div>
                     </div>
                 </div>,
-            reproducoes: code,
+            plays: code,
             time: population
         };
     }
 
     const columns = [
         { id: '#', label: '#' },
-        { id: 'titulo', label: 'Título' },
-        { id: 'reproducoes', label: 'Reproduções' },
+        { id: 'title', label: 'Title' },
+        { id: 'plays', label: 'Plays' },
         { id: 'time', label: <AccessTime />, minWidth: 100 },
     ];
     const rows = [
@@ -147,7 +146,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                         songPlaying === value ? <Pause /> :
                                                         <div>
                                                             {column.id === '#' &&
-                                                                rutils.hasValue(songPlaying) &&
+                                                                songPlaying &&
                                                                 songPlaying !== value &&
                                                                 playingIconOnHover[index]
                                                                 ? <PlayArrow onClick={() => setSongPlaying(value)} /> :

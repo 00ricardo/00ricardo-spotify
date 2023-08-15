@@ -25,7 +25,7 @@ function SpotifyHeader() {
                         variant='circular'
                         src="https://upload.wikimedia.org/wikipedia/commons/3/37/Music_Of_The_Spheres_%28Album%29_2021.jpg"
                     />
-                    <span style={{ marginLeft: '5px' }}>Coldpay • 2021 • 12 músicas, 41min 50s</span>
+                    <span style={{ marginLeft: '5px' }}>Coldpay • 2021 • 12 songs, 41min 50s</span>
                 </div>
             </div>
         </div>

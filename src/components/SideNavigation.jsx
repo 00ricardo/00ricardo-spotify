@@ -5,11 +5,11 @@ function SideNavigation() {
         <div className='native-navigation container-1'>
             <span className='navigation-items'>
                 <HomeOutlined fontSize='large' />
-                <span style={{ paddingLeft: '15px', fontWeight: 'bold' }}>Início</span>
+                <span style={{ paddingLeft: '15px', fontWeight: 'bold' }}>Home</span>
             </span>
             <span className='navigation-items'>
                 <SearchOutlined fontSize='large' />
-                <span style={{ paddingLeft: '15px', fontWeight: 'bold' }}>Buscar</span>
+                <span style={{ paddingLeft: '15px', fontWeight: 'bold' }}>Search</span>
             </span>
         </div>
     )

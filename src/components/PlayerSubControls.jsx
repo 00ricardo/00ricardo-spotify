@@ -15,7 +15,8 @@ function PlayerSubControls() {
         <div className='pb3'>
             <Lyrics fontSize='small' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />
             <QueueMusic fontSize='small' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />
-            <VolumeUp fontSize='small' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />
+            {value > 1 ? <VolumeUp fontSize='small' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} /> :
+                <VolumeMute fontSize='small' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />}
             <div style={{ width: '100px' }}>
                 <Slider
                     value={value}
