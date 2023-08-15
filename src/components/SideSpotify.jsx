@@ -6,7 +6,8 @@ import {
     TextField, InputAdornment,
     Select, FormControl, Avatar
 } from '@mui/material';
-
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 function SideSpotify() {
     const [activateShadow, setActivateShadow] = useState(false)
     const [showSearchInput, setShowSearchInput] = useState(false)
@@ -94,8 +95,16 @@ function SideSpotify() {
                         <span style={{ fontWeight: 'bold', paddingLeft: '10px' }}>Your Library</span>
                     </div>
                     <div>
-                        <Add style={{ paddingRight: '15px' }} />
-                        <ArrowForward style={{ paddingRight: '25px' }} />
+                        <Tooltip title="Create playlist or folder">
+                            <IconButton style={{ color: 'var(--spotify-grey)' }}>
+                                <Add style={{ paddingRight: '15px' }} />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Enlarge Your Library">
+                            <IconButton style={{ color: 'var(--spotify-grey)' }}>
+                                <ArrowForward style={{ paddingRight: '25px' }} />
+                            </IconButton>
+                        </Tooltip>
                     </div>
                 </div>
                 <div style={{

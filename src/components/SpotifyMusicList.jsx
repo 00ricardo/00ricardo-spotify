@@ -9,8 +9,6 @@ import { Audio } from 'react-loader-spinner'
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
     const [playingIconOnHover, setPlayingIconOnHover] = useState(false)
-    const [songPlaying, setSongPlaying] = useState(1)
-
 
     const handleHover = (index) => {
         let newObj = { ...playingIconOnHover }
@@ -25,7 +23,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         newObj[index] = false
         setPlayingIconOnHover({ ...newObj })
     }
-    function createData(id, name, code, population) {
+    function createData(id, name, code, population, isPlaying) {
         return {
             '#': id,
             title:
@@ -41,21 +39,22 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                     <div style={{ paddingLeft: '20px' }}>
                         <div style={{
                             paddingBottom: '5px',
-                            color: songPlaying === id ?
+                            color: isPlaying ?
                                 'var(--spotify-green)' :
                                 'var(--spotify-white)'
                         }}>
                             {name}
                         </div>
                         <div style={{
-                            color: songPlaying === id ? 'var(--spotify-white)' : 'var(--spotify-grey)'
+                            color: isPlaying ? 'var(--spotify-white)' : 'var(--spotify-grey)'
                         }}>
                             Coldplay
                         </div>
                     </div>
                 </div>,
             plays: code,
-            time: population
+            time: population,
+            isPlaying: isPlaying ?? false
         };
     }
 
@@ -64,23 +63,25 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         { id: 'title', label: 'Title' },
         { id: 'plays', label: 'Plays' },
         { id: 'time', label: <AccessTime />, minWidth: 100 },
+
+
     ];
     const rows = [
-        createData(1, 'India', 'IN', 1324171354, 3287263),
-        createData(2, 'China', 'CN', 1403500365, 9596961),
-        createData(3, 'Italy', 'IT', 60483973, 301340),
-        createData(4, 'United States', 'US', 327167434, 9833520),
-        createData(5, 'Canada', 'CA', 37602103, 9984670),
-        createData(6, 'Australia', 'AU', 25475400, 7692024),
-        createData(7, 'Germany', 'DE', 83019200, 357578),
-        createData(8, 'Ireland', 'IE', 4857000, 70273),
-        createData(9, 'Mexico', 'MX', 126577691, 1972550),
-        createData(10, 'Japan', 'JP', 126317000, 377973),
-        createData(11, 'France', 'FR', 67022000, 640679),
-        createData(12, 'United Kingdom', 'GB', 67545757, 242495),
-        createData(13, 'Russia', 'RU', 146793744, 17098246),
-        createData(14, 'Nigeria', 'NG', 200962417, 923768),
-        createData(15, 'Brazil', 'BR', 210147125, 8515767),
+        createData(1, 'India', 'IN', 1324171354, true),
+        createData(2, 'China', 'CN', 1403500365),
+        createData(3, 'Italy', 'IT', 60483973),
+        createData(4, 'United States', 'US', 327167434),
+        createData(5, 'Canada', 'CA', 37602103),
+        createData(6, 'Australia', 'AU', 25475400),
+        createData(7, 'Germany', 'DE', 83019200),
+        createData(8, 'Ireland', 'IE', 4857000),
+        createData(9, 'Mexico', 'MX', 126577691),
+        createData(10, 'Japan', 'JP', 126317000),
+        createData(11, 'France', 'FR', 67022000),
+        createData(12, 'United Kingdom', 'GB', 67545757),
+        createData(13, 'Russia', 'RU', 146793744),
+        createData(14, 'Nigeria', 'NG', 200962417),
+        createData(15, 'Brazil', 'BR', 210147125),
     ];
     return (
         <div className='spotify-container' style={{ color: 'white' }}>
@@ -117,6 +118,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                         }
                     }}
                 >
+                    {console.log(rows)}
                     {rows.map((row, index) => {
                         return (
                             <TableRow
@@ -133,7 +135,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                             {column.format && typeof value === 'number'
                                                 ? column.format(value)
                                                 : column.id === '#' &&
-                                                    songPlaying === value &&
+                                                    row.isPlaying &&
                                                     !playingIconOnHover[index] ?
                                                     <Audio
                                                         height='20'
@@ -143,13 +145,12 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                         wrapperClass='wrapper-class'
                                                         visible={true}
                                                     /> : column.id === '#' &&
-                                                        songPlaying === value ? <Pause /> :
+                                                        row.isPlaying ? <Pause /> :
                                                         <div>
                                                             {column.id === '#' &&
-                                                                songPlaying &&
-                                                                songPlaying !== value &&
+                                                                row.isPlaying &&
                                                                 playingIconOnHover[index]
-                                                                ? <PlayArrow onClick={() => setSongPlaying(value)} /> :
+                                                                ? <PlayArrow onClick={() => console.log()/*setSongPlaying(value)*/} /> :
                                                                 value}
                                                         </div>
                                             }
