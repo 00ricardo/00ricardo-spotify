@@ -1,11 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import Application from './components/Application';
+import { Provider } from 'react-redux'; // Import Provider
+import store from './redux/store'; // Import your Redux store
 import './index.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <div className='background'>
-    <Application />
-  </div>
+  <Provider store={store}>
+    <div className='background'>
+      <Application />
+    </div>
+  </Provider>
+
 
 );

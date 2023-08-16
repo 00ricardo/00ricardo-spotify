@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import { Layers, Add, ArrowForward, Search } from '@mui/icons-material';
 import {
     Chip, ListItem, ListItemButton,
@@ -8,21 +8,18 @@ import {
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFilterSelected, setSortdBy, setPlaylists } from '../redux/reducers/spotifyReducer';
 function SideSpotify() {
+    const dispatch = useDispatch()
+    const { filterSelected, playlists } = useSelector(state => state)
     const [activateShadow, setActivateShadow] = useState(false)
     const [showSearchInput, setShowSearchInput] = useState(false)
-    const [filteringBy, setFiltering] = useState(undefined)
-    const playlistBase = [
-        { name: 'Musicas curtidas', type: 'Playlist', owner: 'Ricardo' },
-        { name: 'Runaljod', type: 'Album', owner: 'Wardruna' },
-        { name: 'Spheres', type: 'Playlist', owner: 'Ricardo' },
-        { name: 'Ed Steele', type: 'Artist', owner: '' },
-        { name: 'Three Days Grace', type: 'Artist', owner: '' },
-        { name: 'Progressive Techno V1', type: 'Playlist', owner: 'Ricardo' },
-        { name: 'Progressive Techno V2', type: 'Playlist', owner: 'Ricardo' }
-    ]
-    const [playlists, setPlaylists] = useState(playlistBase)
-    const filters = ['Recents', 'Recently added recentemente', 'Alphabetical', 'Creator']
+    const filters = [
+        { label: 'Recents', value: 'RECENTS' },
+        { label: 'Recently added', value: 'RECENTLY_ADDED' },
+        { label: 'Alphabetical', value: 'ALPHABETICAL' },
+        { label: 'Creator', value: 'CREATOR' }]
     const trackListRef = useRef(null);
 
     const handleShadowBox = (e) => {
@@ -31,17 +28,23 @@ function SideSpotify() {
     }
 
     const handleFiltering = (filter) => {
-        setFiltering(filter)
-        const res = filterBy(playlistBase, filter)
-        setPlaylists([...res])
+        dispatch(setFilterSelected(filter))
+        const res = filterBy(playlists.base, filter)
+        dispatch(setPlaylists([...res]))
+    }
+
+    const handleSortedByFilter = (e) => {
+        const value = e.target.value
+        dispatch(setSortdBy(value))
     }
 
     const handleDelete = () => {
-        setFiltering(undefined)
-        setPlaylists([...playlistBase])
+        dispatch(setFilterSelected(null))
+        dispatch(setPlaylists([...playlists.base]))
     };
 
-    const filterBy = (playlistBase, filter) => playlistBase.filter((p) => p.type === filter)
+    const filterBy = (playlistBase, filter) => playlistBase.filter((p) => p.type.value === filter)
+
 
     function renderSongs(song, index) {
         return (
@@ -77,7 +80,7 @@ function SideSpotify() {
                                     color: 'var(--spotify-grey)',
                                     fontWeight: 'initial'
                                 }}>
-                                {`${song?.type} ${song.owner ? '•' : ''} ${song?.owner}`}
+                                {`${song?.type.label} ${song.owner ? '•' : ''} ${song?.owner}`}
                             </ListItem>
                         </div>
                     </ListItemButton>
@@ -86,6 +89,16 @@ function SideSpotify() {
         )
     }
 
+
+    useEffect(() => {
+        const lsFilteredBy = localStorage.getItem('filterSelected')
+        if (lsFilteredBy !== 'null' && lsFilteredBy && playlists.base) {
+            console.log(lsFilteredBy)
+            console.log(playlists.base)
+            const res = filterBy(playlists.base, lsFilteredBy)
+            dispatch(setPlaylists([...res]))
+        }
+    }, [dispatch, playlists.base])
     return (
         <div className='side-spotify container-1'>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -117,21 +130,21 @@ function SideSpotify() {
 
                     <Chip label="Playlists"
                         className='filter-badges'
-                        onDelete={filteringBy === 'Playlist' ? handleDelete : undefined}
-                        onClick={() => handleFiltering('Playlist')} />
+                        onDelete={filterSelected === 'PLAYLIST' || localStorage.getItem('filterSelected') === 'PLAYLIST' ? handleDelete : undefined}
+                        onClick={() => handleFiltering('PLAYLIST')} />
                     <Chip label="Artists"
                         className='filter-badges'
-                        onDelete={filteringBy === 'Artist' ? handleDelete : undefined}
-                        onClick={() => handleFiltering('Artist')} />
+                        onDelete={filterSelected === 'ARTIST' || localStorage.getItem('filterSelected') === 'ARTIST' ? handleDelete : undefined}
+                        onClick={() => handleFiltering('ARTIST')} />
                     <Chip label="Albums"
                         className='filter-badges'
-                        onDelete={filteringBy === 'Album' ? handleDelete : undefined}
-                        onClick={() => handleFiltering('Album')} />
+                        onDelete={filterSelected === 'ALBUM' || localStorage.getItem('filterSelected') === 'ALBUM' ? handleDelete : undefined}
+                        onClick={() => handleFiltering('ALBUM')} />
                 </div>
             </div>
             <div ref={trackListRef} className='track-list' onScroll={(e) => handleShadowBox(e)}>
                 <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '50%' }}>
                         {showSearchInput ? <TextField
                             size="small"
                             style={{ color: 'var(--spotify-grey)', background: 'var(--spotify-container4)' }}
@@ -148,7 +161,8 @@ function SideSpotify() {
                     <FormControl size="small">
                         <Select
                             native
-                            defaultValue="Recentes"
+                            onChange={(e) => handleSortedByFilter(e)}
+                            defaultValue="RECENTS"
                             style={{
                                 color: 'var(--spotify-grey)',
                                 backgroundColor: 'var(--spotify-container1)'
@@ -163,18 +177,19 @@ function SideSpotify() {
                                 {filters.map((f, i) => (
                                     <option
                                         key={i}
-                                        value={f}
+                                        value={f.value}
+
                                         style={{
                                             color: 'var(--spotify-white)',
                                             backgroundColor: 'var(--spotify-container3)',
-                                        }}>{f} </option>
+                                        }}>{f.label} </option>
                                 ))}
                             </optgroup>
                         </Select>
                     </FormControl>
                 </div>
 
-                {playlists.map((playlist, idx) => renderSongs(playlist, idx))}
+                {playlists.filtered.map((playlist, idx) => renderSongs(playlist, idx))}
             </div>
         </div>
     )
