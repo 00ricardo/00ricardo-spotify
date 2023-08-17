@@ -1,19 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { LinearProgress } from '@mui/material';
 import {
     PlayCircle, SkipPrevious, SkipNext,
     Shuffle, Repeat, Pause
 } from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
 
 export default function Player() {
+    const dispatch = useDispatch()
+    const songTimeMax = 5 // dummy example 03:23
+    const { songPlaying, songSelected } = useSelector((state) => state)
     const [songTimeProgress, setSongTimeProgress] = useState(0);
     const [songTime, setSongTime] = useState(0);
-    const [songTimeMax, setSongTimeMax] = useState(150); // dummy example 03:23
     const [songTimeParser, setSongTimeParser] = useState('00:00');
-    const [playing, setPlaying] = useState(false);
     const [timerRef, setTimerRef] = useState(null);
+    const [_songSelected, _setSongSelected] = useState(songSelected)
+
+    const prevSongSelected = useRef(null); // Store the previous songSelected value
 
     const runSongTimer = () => {
         const stepper = 100 / songTimeMax;
@@ -25,7 +31,12 @@ export default function Player() {
                     setTimerRef(null);
                     setSongTimeParser('00:00');
                     setSongTimeProgress(0); // Reset progress
-                    setPlaying(false); // Automatically pause when song ends
+
+                    //Jump to next song
+                    const dummySong = { ...songSelected }
+                    dummySong['#'] = dummySong['#'] + 1
+                    dispatch(setSongSelected(dummySong))
+                    dispatch(setSongPlaying(true)); // Pause the song
                     return 0;
                 }
                 // Update song time and progress
@@ -49,26 +60,56 @@ export default function Player() {
 
     // Function to play or pause the song
     const playOrPause = () => {
-        if (playing) {
+        if (songSelected.isPlaying) {
             clearInterval(timerRef);
             setTimerRef(null);
         } else {
             runSongTimer();
         }
-        setPlaying(!playing);
+        dispatch(setSongPlaying(!songSelected.isPlaying)); // Play the song
     };
-    // listener to handle pausing when playing state changes to false
-    useEffect(() => {
-        if (!playing) {
-            clearInterval(timerRef);
-            setTimerRef(null);
-        }
-    }, [playing]);
 
     useEffect(() => {
-        runSongTimer();
-        setPlaying(true);
-    }, []);
+        // useSelector takes priority
+        const prevSong = prevSongSelected.current ? prevSongSelected.current['#'] : null;
+        const newSong = songSelected ? songSelected['#'] : null;
+        // only reset if we selected a different song to play
+        if (prevSong !== newSong) {
+            if (songPlaying) {
+                console.log(2)
+                // Reset timer progress
+                clearInterval(timerRef);
+                setTimerRef(null);
+                setSongTimeParser('00:00');
+                setSongTime(0)
+                setSongTimeProgress(0);
+                runSongTimer();
+            }
+        } else {
+            if (songPlaying
+                && songSelected.isPlaying
+                && songTimeProgress === 0) runSongTimer();
+        }
+
+    }, [songPlaying, songSelected]);
+
+
+    useEffect(() => {
+        if (!songSelected.isPlaying && timerRef) {
+            // Resume... continue progress timer
+            clearInterval(timerRef);
+        } else {
+            if (timerRef) {
+                runSongTimer();
+            }
+        }
+    }, [songSelected.isPlaying]);
+
+    useEffect(() => {
+        // Store the current songSelected value in the ref
+        prevSongSelected.current = songSelected;
+    }, [songSelected]);
+
     return (
         <div>
             <div className='player-controls'>
@@ -76,7 +117,7 @@ export default function Player() {
                 <SkipPrevious fontSize='medium' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />
 
                 <div onClick={() => playOrPause()}>
-                    {!playing ?
+                    {!songSelected.isPlaying ?
                         <PlayCircle fontSize='large' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} /> :
                         <Pause fontSize='large' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />}
                 </div>

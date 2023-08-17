@@ -11,6 +11,9 @@
     --spotify-default-blue: #0b195b;
 }
 
+
+
+
 body {
     background-color: var(--spotify-black);
     font-family: 'system-ui'
@@ -19,7 +22,28 @@ body {
 .background {
     height: 97vh;
     overflow: hidden;
+    display: inline-block;
 }
+
+
+/* ? scrollbar width  */
+.container-1::-webkit-scrollbar,
+.track-list::-webkit-scrollbar {
+    width: 12px;
+}
+
+/* ? scrollbar background  */
+.container-1::-webkit-scrollbar-track,
+.track-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ? scrollbar bar itself  */
+.container-1::-webkit-scrollbar-thumb,
+.track-list::-webkit-scrollbar-thumb {
+    background: var(--spotify-grey);
+}
+
 
 .container-1 {
     background-color: var(--spotify-container1);
@@ -54,16 +78,14 @@ body {
 
 .side-spotify {
     justify-content: flex-start;
+    height: 90vh;
+    margin-bottom: 0;
 }
 
 
 .navigation-items {
     display: flex;
     align-items: center;
-}
-
-.side-spotify {
-    height: 70vh;
 }
 
 .playbar {
@@ -80,7 +102,7 @@ body {
     border-radius: 10px;
     width: 100%;
     overflow: auto;
-    height: 630px;
+    height: 90vh;
 
 }
 
@@ -213,4 +235,20 @@ a {
 
 .filter-badges:hover {
     background-color: var(--spotify-container4) !important;
+}
+
+.MuiSelect-icon {
+    color: var(--spotify-grey) !important;
+}
+
+.MuiPaper-root {
+    background-color: var(--spotify-container3) !important;
+}
+
+.MuiPaper-root li:hover {
+    background-color: var(--spotify-container4) !important;
+}
+
+.MuiPaper-root li[aria-selected="true"] {
+    color: var(--spotify-green) !important;
 }

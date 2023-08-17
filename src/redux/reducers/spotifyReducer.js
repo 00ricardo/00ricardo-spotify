@@ -25,7 +25,13 @@ const initialState = {
     title: 'Music Of The Spheres',
     author: 'Coldplay'
   },
-  songSelected: {},
+  songSelected: {
+    "#": 1,
+    title: null,
+    plays: "IN",
+    time: 1324171354,
+    isPlaying: false
+  },
   songPlaying: false,
   filterSelected: null,
   sortedBy: 'RECENTS'
@@ -46,17 +52,36 @@ const setSortdByReducer = (state, action) => {
   state.sortedBy = value
   localStorage.setItem('sortedBy', value)
 }
+const setSongPlayingReducer = (state, action) => {
+  const value = action.payload ?? false;
+  state.songPlaying = value
+}
+
+const setSongSelectedReducer = (state, action) => {
+  const value = action.payload ? { ...action.payload } : {};
+  state.songSelected = value
+}
+
+
 const SpotifySlice = createSlice({
   name: 'spotify',
   initialState,
   reducers: {
     setPlaylists: setPlaylistsReducer,
     setFilterSelected: setFilterSelectedReducer,
-    setSortdBy: setSortdByReducer
+    setSortdBy: setSortdByReducer,
+    setSongPlaying: setSongPlayingReducer,
+    setSongSelected: setSongSelectedReducer
   }
 });
 
-export const { setPlaylists, setFilterSelected, setSortdBy } = SpotifySlice.actions;
+export const {
+  setPlaylists,
+  setFilterSelected,
+  setSortdBy,
+  setSongPlaying,
+  setSongSelected
+} = SpotifySlice.actions;
 
 export default SpotifySlice.reducer;
 

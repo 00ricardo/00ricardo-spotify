@@ -4,7 +4,7 @@ import { Layers, Add, ArrowForward, Search } from '@mui/icons-material';
 import {
     Chip, ListItem, ListItemButton,
     TextField, InputAdornment,
-    Select, FormControl, Avatar
+    Select, FormControl, Avatar, MenuItem
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -33,9 +33,26 @@ function SideSpotify() {
         dispatch(setPlaylists([...res]))
     }
 
+
     const handleSortedByFilter = (e) => {
         const value = e.target.value
         dispatch(setSortdBy(value))
+        let sorted = [...playlists.filtered]
+        switch (value) {
+            case 'RECENTS':
+                break;
+            case 'RECENTLY_ADDED':
+                break;
+            case 'ALPHABETICAL':
+                sorted = sorted.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'CREATOR':
+                sorted = sorted.sort((a, b) => a.owner.localeCompare(b.owner));
+                break;
+            default:
+                break;
+        }
+        dispatch(setPlaylists([...sorted]))
     }
 
     const handleDelete = () => {
@@ -127,7 +144,6 @@ function SideSpotify() {
                         'rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px'
                         : ''
                 }}>
-
                     <Chip label="Playlists"
                         className='filter-badges'
                         onDelete={filterSelected === 'PLAYLIST' || localStorage.getItem('filterSelected') === 'PLAYLIST' ? handleDelete : undefined}
@@ -160,35 +176,28 @@ function SideSpotify() {
                     </div>
                     <FormControl size="small">
                         <Select
-                            native
                             onChange={(e) => handleSortedByFilter(e)}
                             defaultValue="RECENTS"
                             style={{
                                 color: 'var(--spotify-grey)',
                                 backgroundColor: 'var(--spotify-container1)'
                             }}>
-                            <optgroup
-                                label="Sorted by"
-                                style={{
-                                    color: 'var(--spotify-grey)',
-                                    backgroundColor: 'var(--spotify-container3)',
-                                    fontSize: 'small'
-                                }}>
-                                {filters.map((f, i) => (
-                                    <option
-                                        key={i}
-                                        value={f.value}
-
-                                        style={{
-                                            color: 'var(--spotify-white)',
-                                            backgroundColor: 'var(--spotify-container3)',
-                                        }}>{f.label} </option>
-                                ))}
-                            </optgroup>
+                            <MenuItem disabled value="" style={{ fontWeight: 'bold', fontSize: '10px', color: 'var(--spotify-white)' }}>
+                                <em>Sort by</em>
+                            </MenuItem>
+                            {filters.map((f, i) => (
+                                <MenuItem
+                                    style={{
+                                        color: 'var(--spotify-white)',
+                                        backgroundColor: 'var(--spotify-container3)',
+                                    }}
+                                    key={i} value={f.value} >
+                                    {f.label}
+                                </MenuItem>
+                            ))}
                         </Select>
                     </FormControl>
                 </div>
-
                 {playlists.filtered.map((playlist, idx) => renderSongs(playlist, idx))}
             </div>
         </div>

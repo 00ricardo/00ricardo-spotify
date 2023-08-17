@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SpotifyControllers from './SpotifyControllers';
 import {
     TableBody, Table,
@@ -6,9 +6,14 @@ import {
 } from '@mui/material';
 import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Audio } from 'react-loader-spinner'
+import { useDispatch, useSelector } from 'react-redux';
+import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
+    const dispatch = useDispatch()
+    const { songSelected } = useSelector((state) => state)
     const [playingIconOnHover, setPlayingIconOnHover] = useState(false)
+    const [data, setData] = useState([])
 
     const handleHover = (index) => {
         let newObj = { ...playingIconOnHover }
@@ -23,6 +28,30 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         newObj[index] = false
         setPlayingIconOnHover({ ...newObj })
     }
+    const handlePlaySong = (songObj, songIdx) => {
+        const _data = [...data]
+        _data.map((d, i) => {
+            if (d.isPlaying && i !== songIdx) d.isPlaying = false
+            if (i === songIdx) d.isPlaying = true
+            return d
+        })
+        setData([..._data])
+        dispatch(setSongSelected({ ...songObj }))
+        dispatch(setSongPlaying(true))
+    }
+
+    const handlePauseSong = (songObj, songIdx) => {
+        const _data = [...data]
+        _data.map((d, i) => {
+            d.isPlaying = false
+            return d
+        })
+        setData([..._data])
+        dispatch(setSongSelected({ ...songObj }))
+        dispatch(setSongPlaying(false))
+
+    }
+
     function createData(id, name, code, population, isPlaying) {
         return {
             '#': id,
@@ -63,26 +92,28 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         { id: 'title', label: 'Title' },
         { id: 'plays', label: 'Plays' },
         { id: 'time', label: <AccessTime />, minWidth: 100 },
-
-
     ];
-    const rows = [
-        createData(1, 'India', 'IN', 1324171354, true),
-        createData(2, 'China', 'CN', 1403500365),
-        createData(3, 'Italy', 'IT', 60483973),
-        createData(4, 'United States', 'US', 327167434),
-        createData(5, 'Canada', 'CA', 37602103),
-        createData(6, 'Australia', 'AU', 25475400),
-        createData(7, 'Germany', 'DE', 83019200),
-        createData(8, 'Ireland', 'IE', 4857000),
-        createData(9, 'Mexico', 'MX', 126577691),
-        createData(10, 'Japan', 'JP', 126317000),
-        createData(11, 'France', 'FR', 67022000),
-        createData(12, 'United Kingdom', 'GB', 67545757),
-        createData(13, 'Russia', 'RU', 146793744),
-        createData(14, 'Nigeria', 'NG', 200962417),
-        createData(15, 'Brazil', 'BR', 210147125),
-    ];
+
+    useEffect(() => {
+        const rows = [
+            createData(1, 'India', 'IN', 1324171354),
+            createData(2, 'China', 'CN', 1403500365),
+            createData(3, 'Italy', 'IT', 60483973),
+            createData(4, 'United States', 'US', 327167434),
+            createData(5, 'Canada', 'CA', 37602103),
+            createData(6, 'Australia', 'AU', 25475400),
+            createData(7, 'Germany', 'DE', 83019200),
+            createData(8, 'Ireland', 'IE', 4857000),
+            createData(9, 'Mexico', 'MX', 126577691),
+            createData(10, 'Japan', 'JP', 126317000),
+            createData(11, 'France', 'FR', 67022000),
+            createData(12, 'United Kingdom', 'GB', 67545757),
+            createData(13, 'Russia', 'RU', 146793744),
+            createData(14, 'Nigeria', 'NG', 200962417),
+            createData(15, 'Brazil', 'BR', 210147125),
+        ];
+        setData([...rows])
+    }, [])
     return (
         <div className='spotify-container' style={{ color: 'white' }}>
             <SpotifyControllers />
@@ -118,8 +149,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                         }
                     }}
                 >
-                    {console.log(rows)}
-                    {rows.map((row, index) => {
+                    {data.map((row, index) => {
                         return (
                             <TableRow
                                 hover
@@ -145,12 +175,17 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                         wrapperClass='wrapper-class'
                                                         visible={true}
                                                     /> : column.id === '#' &&
-                                                        row.isPlaying ? <Pause /> :
-                                                        <div>
+                                                        row.isPlaying ? <Pause onClick={() => handlePauseSong(row, index)} /> :
+                                                        <div style={{
+                                                            fontWeight: 'bold',
+                                                            color: column.id === '#' &&
+                                                                songSelected['#'] === row['#'] ?
+                                                                'var(--spotify-green)' : 'inherit'
+                                                        }}>
                                                             {column.id === '#' &&
-                                                                row.isPlaying &&
+                                                                !row.isPlaying &&
                                                                 playingIconOnHover[index]
-                                                                ? <PlayArrow onClick={() => console.log()/*setSongPlaying(value)*/} /> :
+                                                                ? <PlayArrow onClick={() => handlePlaySong(row, index)} /> :
                                                                 value}
                                                         </div>
                                             }
