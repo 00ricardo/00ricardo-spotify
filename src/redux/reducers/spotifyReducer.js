@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-
+import musicOfTheSpheresImg from '../../public/img/spotify-music-of-spheres.jpg'
+import likedSongsImg from '../../public/img/spotify-liked-songs.png'
 const initialState = {
   playlists: {
     base: [
-      { name: 'Musicas curtidas', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
+      { name: 'Liked Songs', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo', src: likedSongsImg },
       { name: 'Runaljod', type: { label: 'Album', value: 'ALBUM' }, owner: 'Wardruna' },
       { name: 'Spheres', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
       { name: 'Ed Steele', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
@@ -12,7 +13,7 @@ const initialState = {
       { name: 'Progressive Techno V2', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' }
     ],
     filtered: [
-      { name: 'Musicas curtidas', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
+      { name: 'Liked Songs', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo', src: likedSongsImg },
       { name: 'Runaljod', type: { label: 'Album', value: 'ALBUM' }, owner: 'Wardruna' },
       { name: 'Spheres', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
       { name: 'Ed Steele', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
@@ -23,7 +24,11 @@ const initialState = {
   },
   playlistSelected: {
     title: 'Music Of The Spheres',
-    author: 'Coldplay'
+    author: 'Coldplay',
+    playlistType: 'Album',
+    songsCount: 12,
+    timeCount: '41min 50s',
+    src: musicOfTheSpheresImg
   },
   songSelected: {
     "#": 1,

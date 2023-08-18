@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Avatar, } from '@mui/material';
 import { PictureInPictureAlt } from '@mui/icons-material';
-import SpotifyLike from "../lotties/spotify-like.json";
+import SpotifyLike from '../public/lotties/spotify-like.json'
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 function PlayerTrack() {
     const [end, setEnd] = useState(false)

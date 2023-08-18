@@ -2,18 +2,23 @@ import React, { useEffect, useState, useRef } from 'react'
 import {
     PlayCircle,
     DownloadForOfflineOutlined,
-    MoreHorizOutlined
+    MoreHorizOutlined, PauseCircle
 } from '@mui/icons-material';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
-import SpotifyLike from "../lotties/spotify-like.json";
+import SpotifyLike from '../public/lotties/spotify-like.json'
+import { useDispatch, useSelector } from 'react-redux';
+import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
+
 function SpotifyControllers() {
+    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state)
     const [end, setEnd] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const lottieRef = useRef(null);
+    const dispatch = useDispatch()
 
     const startLikeAnimation = () => {
         setEnd(false)
@@ -32,7 +37,6 @@ function SpotifyControllers() {
         }
     };
 
-
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -40,6 +44,32 @@ function SpotifyControllers() {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handlePlaySong = () => {
+        const _data = [...spotifyMusicList]
+        const songIdx = songSelected['#']
+        const _songIdx = _data.findIndex((d, i) => d['#'] === songIdx)
+        if (_songIdx !== -1) {
+            _data[_songIdx] = { ...songSelected, isPlaying: true }
+        }
+
+        dispatch(setSpotifyMusicList([..._data]))
+        const updateSongSelected = { ...songSelected, isPlaying: true }
+        dispatch(setSongSelected(updateSongSelected))
+        dispatch(setSongPlaying(true))
+    }
+
+    const handlePauseSong = () => {
+        const _data = [...spotifyMusicList]
+        const newData = _data.map((d, i) => {
+            const obj = { ...d, isPlaying: false }
+            return obj
+        })
+        dispatch(setSpotifyMusicList([...newData]))
+        const updateSongSelected = { ...songSelected, isPlaying: false }
+        dispatch(setSongSelected(updateSongSelected))
+        dispatch(setSongPlaying(false))
+    }
 
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
@@ -51,7 +81,23 @@ function SpotifyControllers() {
 
     return (
         <div className='spotify-main-controlers'>
-            <PlayCircle sx={{ fontSize: 70 }} fontSize='large' style={{ color: 'var(--spotify-green)', paddingRight: '15px' }} />
+            {songPlaying ?
+                <PauseCircle
+                    onClick={() => handlePauseSong()}
+                    sx={{ fontSize: 70 }}
+                    fontSize='large'
+                    style={{
+                        color: 'var(--spotify-green)',
+                        paddingRight: '15px'
+                    }} /> :
+                <PlayCircle
+                    onClick={() => handlePlaySong()}
+                    sx={{ fontSize: 70 }}
+                    fontSize='large'
+                    style={{
+                        color: 'var(--spotify-green)',
+                        paddingRight: '15px'
+                    }} />}
             <Tooltip title="Save to Your Library">
                 <IconButton className='like-btn' onClick={startLikeAnimation}>
                     <LootieLikeButton

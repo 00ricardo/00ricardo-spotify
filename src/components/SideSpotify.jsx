@@ -80,7 +80,7 @@ function SideSpotify() {
                                 borderRadius: '5px'
                             }}
                             variant='square'
-                            src="https://upload.wikimedia.org/wikipedia/commons/3/37/Music_Of_The_Spheres_%28Album%29_2021.jpg"
+                            src={song.src ? song.src : "https://upload.wikimedia.org/wikipedia/commons/3/37/Music_Of_The_Spheres_%28Album%29_2021.jpg"}
                         />
                         <div
                             className='playlist-item'

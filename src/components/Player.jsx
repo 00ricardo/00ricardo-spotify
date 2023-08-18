@@ -80,12 +80,25 @@ export default function Player() {
 
     // Function to play or pause the song
     const playOrPause = () => {
+        const _data = [...spotifyMusicList]
+        let newData = null
         if (songSelected.isPlaying) {
-            clearInterval(timerRef);
-            setTimerRef(null);
+            newData = _data.map((d, i) => {
+                const obj = { ...d, isPlaying: false }
+                return obj
+            })
+
         } else {
-            runSongTimer();
+            const songIdx = songSelected['#']
+            const _songIdx = _data.findIndex((d, i) => d['#'] === songIdx)
+            if (_songIdx !== -1) {
+                _data[_songIdx] = { ...songSelected, isPlaying: true }
+            }
+            newData = [..._data]
         }
+        dispatch(setSpotifyMusicList([...newData]))
+        const updateSongSelected = { ...songSelected, isPlaying: !songSelected.isPlaying }
+        dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(!songSelected.isPlaying)); // Play the song
     };
 

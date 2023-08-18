@@ -30,30 +30,32 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     }
     const handlePlaySong = (songObj, songIdx) => {
         const _data = [...data]
-        _data.map((dt, i) => {
+        const newData = _data.map((dt, i) => {
             const d = { ...dt }
             if (d.isPlaying && i !== songIdx) d.isPlaying = false
             if (i === songIdx) d.isPlaying = true
+            console.log(d)
+            console.log(i)
             return d
         })
-        setData([..._data])
-        dispatch(setSpotifyMusicList([..._data]))
+        setData([...newData])
+        dispatch(setSpotifyMusicList([...newData]))
         const updateSongSelected = { ...songObj, isPlaying: true }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(true))
-        console.log(updateSongSelected)
     }
 
     const handlePauseSong = (songObj, songIdx) => {
         const _data = [...data]
-        _data.map((dt, i) => {
+        const newData = _data.map((dt, i) => {
             const d = { ...dt }
             d.isPlaying = false
             return d
         })
-        setData([..._data])
-        dispatch(setSpotifyMusicList([..._data]))
-        dispatch(setSongSelected({ ...songObj }))
+        setData([...newData])
+        dispatch(setSpotifyMusicList([...newData]))
+        const updateSongSelected = { ...songObj, isPlaying: false }
+        dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(false))
     }
 
