@@ -50,7 +50,7 @@ function SpotifyControllers() {
 
 
     return (
-        <div className='spotify-main-controlers' style={{ padding: 0 }}>
+        <div className='spotify-main-controlers'>
             <PlayCircle sx={{ fontSize: 70 }} fontSize='large' style={{ color: 'var(--spotify-green)', paddingRight: '15px' }} />
             <Tooltip title="Save to Your Library">
                 <IconButton className='like-btn' onClick={startLikeAnimation}>

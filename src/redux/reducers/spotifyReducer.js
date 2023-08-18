@@ -34,7 +34,114 @@ const initialState = {
   },
   songPlaying: false,
   filterSelected: null,
-  sortedBy: 'RECENTS'
+  sortedBy: 'RECENTS',
+  spotifyMusicList: [
+    {
+      "#": 1,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "IN",
+      "time": 1324171354,
+      "isPlaying": false
+    },
+    {
+      "#": 2,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "CN",
+      "time": 1403500365,
+      "isPlaying": false
+    },
+    {
+      "#": 3,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "IT",
+      "time": 60483973,
+      "isPlaying": false
+    },
+    {
+      "#": 4,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "US",
+      "time": 327167434,
+      "isPlaying": false
+    },
+    {
+      "#": 5,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "CA",
+      "time": 37602103,
+      "isPlaying": false
+    },
+    {
+      "#": 6,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "AU",
+      "time": 25475400,
+      "isPlaying": false
+    },
+    {
+      "#": 7,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "DE",
+      "time": 83019200,
+      "isPlaying": false
+    },
+    {
+      "#": 8,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "IE",
+      "time": 4857000,
+      "isPlaying": false
+    },
+    {
+      "#": 9,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "MX",
+      "time": 126577691,
+      "isPlaying": false
+    },
+    {
+      "#": 10,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "JP",
+      "time": 126317000,
+      "isPlaying": false
+    },
+    {
+      "#": 11,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "FR",
+      "time": 67022000,
+      "isPlaying": false
+    },
+    {
+      "#": 12,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "GB",
+      "time": 67545757,
+      "isPlaying": false
+    },
+    {
+      "#": 13,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "RU",
+      "time": 146793744,
+      "isPlaying": false
+    },
+    {
+      "#": 14,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "NG",
+      "time": 200962417,
+      "isPlaying": false
+    },
+    {
+      "#": 15,
+      "title": null, "name": "Dummy Music Name",
+      "plays": "BR",
+      "time": 210147125,
+      "isPlaying": false
+    }
+  ]
 };
 
 const setPlaylistsReducer = (state, action) => {
@@ -62,6 +169,10 @@ const setSongSelectedReducer = (state, action) => {
   state.songSelected = value
 }
 
+const setSpotifyMusicListReducer = (state, action) => {
+  const value = action.payload ? [...action.payload] : [];
+  state.spotifyMusicList = value
+}
 
 const SpotifySlice = createSlice({
   name: 'spotify',
@@ -71,7 +182,8 @@ const SpotifySlice = createSlice({
     setFilterSelected: setFilterSelectedReducer,
     setSortdBy: setSortdByReducer,
     setSongPlaying: setSongPlayingReducer,
-    setSongSelected: setSongSelectedReducer
+    setSongSelected: setSongSelectedReducer,
+    setSpotifyMusicList: setSpotifyMusicListReducer
   }
 });
 
@@ -80,7 +192,8 @@ export const {
   setFilterSelected,
   setSortdBy,
   setSongPlaying,
-  setSongSelected
+  setSongSelected,
+  setSpotifyMusicList
 } = SpotifySlice.actions;
 
 export default SpotifySlice.reducer;

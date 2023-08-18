@@ -7,13 +7,13 @@ import {
 import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Audio } from 'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux';
-import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
+import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
     const dispatch = useDispatch()
-    const { songSelected } = useSelector((state) => state)
+    const { songSelected, spotifyMusicList } = useSelector((state) => state)
     const [playingIconOnHover, setPlayingIconOnHover] = useState(false)
-    const [data, setData] = useState([])
+    const [data, setData] = useState(spotifyMusicList)
 
     const handleHover = (index) => {
         let newObj = { ...playingIconOnHover }
@@ -30,32 +30,38 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     }
     const handlePlaySong = (songObj, songIdx) => {
         const _data = [...data]
-        _data.map((d, i) => {
+        _data.map((dt, i) => {
+            const d = { ...dt }
             if (d.isPlaying && i !== songIdx) d.isPlaying = false
             if (i === songIdx) d.isPlaying = true
             return d
         })
         setData([..._data])
-        dispatch(setSongSelected({ ...songObj }))
+        dispatch(setSpotifyMusicList([..._data]))
+        const updateSongSelected = { ...songObj, isPlaying: true }
+        dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(true))
+        console.log(updateSongSelected)
     }
 
     const handlePauseSong = (songObj, songIdx) => {
         const _data = [...data]
-        _data.map((d, i) => {
+        _data.map((dt, i) => {
+            const d = { ...dt }
             d.isPlaying = false
             return d
         })
         setData([..._data])
+        dispatch(setSpotifyMusicList([..._data]))
         dispatch(setSongSelected({ ...songObj }))
         dispatch(setSongPlaying(false))
-
     }
 
-    function createData(id, name, code, population, isPlaying) {
-        return {
-            '#': id,
-            title:
+    useEffect(() => {
+        const _data = [...data]
+        const completeData = _data.map((d, i) => {
+            let obj = { ...d }
+            obj.title =
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Avatar
                         style={{
@@ -68,24 +74,30 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                     <div style={{ paddingLeft: '20px' }}>
                         <div style={{
                             paddingBottom: '5px',
-                            color: isPlaying ?
+                            color: d.isPlaying ?
                                 'var(--spotify-green)' :
                                 'var(--spotify-white)'
                         }}>
-                            {name}
+                            {d.name}
                         </div>
                         <div style={{
-                            color: isPlaying ? 'var(--spotify-white)' : 'var(--spotify-grey)'
+                            color: d.isPlaying ? 'var(--spotify-white)' : 'var(--spotify-grey)'
                         }}>
                             Coldplay
                         </div>
                     </div>
-                </div>,
-            plays: code,
-            time: population,
-            isPlaying: isPlaying ?? false
-        };
-    }
+                </div>
+            return obj
+        })
+        setData(completeData)
+        dispatch(setSpotifyMusicList(completeData))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    useEffect(() => {
+        const _data = [...spotifyMusicList]
+        setData(_data)
+    }, [spotifyMusicList])
 
     const columns = [
         { id: '#', label: '#' },
@@ -94,26 +106,6 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         { id: 'time', label: <AccessTime />, minWidth: 100 },
     ];
 
-    useEffect(() => {
-        const rows = [
-            createData(1, 'India', 'IN', 1324171354),
-            createData(2, 'China', 'CN', 1403500365),
-            createData(3, 'Italy', 'IT', 60483973),
-            createData(4, 'United States', 'US', 327167434),
-            createData(5, 'Canada', 'CA', 37602103),
-            createData(6, 'Australia', 'AU', 25475400),
-            createData(7, 'Germany', 'DE', 83019200),
-            createData(8, 'Ireland', 'IE', 4857000),
-            createData(9, 'Mexico', 'MX', 126577691),
-            createData(10, 'Japan', 'JP', 126317000),
-            createData(11, 'France', 'FR', 67022000),
-            createData(12, 'United Kingdom', 'GB', 67545757),
-            createData(13, 'Russia', 'RU', 146793744),
-            createData(14, 'Nigeria', 'NG', 200962417),
-            createData(15, 'Brazil', 'BR', 210147125),
-        ];
-        setData([...rows])
-    }, [])
     return (
         <div className='spotify-container' style={{ color: 'white' }}>
             <SpotifyControllers />
@@ -126,7 +118,6 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                     <TableRow >
                         {columns.map((column, idx) => (
                             <TableCell
-
                                 key={idx}
                                 align={column.align}
                                 style={{
@@ -161,11 +152,11 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                 {columns.map((column, idx) => {
                                     const value = row[column.id];
                                     return (
-                                        <TableCell key={idx} align={column.align} style={{ color: 'white', borderBottom: 'none' }}>
+                                        <TableCell key={idx} align={column.align} style={{ color: 'white', borderBottom: 'none', width: column.id === '#' ? '25px' : 'inherit' }}>
                                             {column.format && typeof value === 'number'
                                                 ? column.format(value)
                                                 : column.id === '#' &&
-                                                    row.isPlaying &&
+                                                    (row['#'] === songSelected['#'] && songSelected.isPlaying) &&
                                                     !playingIconOnHover[index] ?
                                                     <Audio
                                                         height='20'
@@ -175,7 +166,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                         wrapperClass='wrapper-class'
                                                         visible={true}
                                                     /> : column.id === '#' &&
-                                                        row.isPlaying ? <Pause onClick={() => handlePauseSong(row, index)} /> :
+                                                        (row['#'] === songSelected['#'] && songSelected.isPlaying) ? <Pause onClick={() => handlePauseSong(row, index)} /> :
                                                         <div style={{
                                                             fontWeight: 'bold',
                                                             color: column.id === '#' &&
@@ -183,7 +174,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                                 'var(--spotify-green)' : 'inherit'
                                                         }}>
                                                             {column.id === '#' &&
-                                                                !row.isPlaying &&
+                                                                (row['#'] !== songSelected['#'] || !songSelected.isPlaying) &&
                                                                 playingIconOnHover[index]
                                                                 ? <PlayArrow onClick={() => handlePlaySong(row, index)} /> :
                                                                 value}

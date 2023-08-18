@@ -7,12 +7,12 @@ import {
     Shuffle, Repeat, Pause
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
+import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
 
 export default function Player() {
     const dispatch = useDispatch()
-    const songTimeMax = 5 // dummy example 03:23
-    const { songPlaying, songSelected } = useSelector((state) => state)
+    const songTimeMax = 250 // dummy example 03:23
+    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state)
     const [songTimeProgress, setSongTimeProgress] = useState(0);
     const [songTime, setSongTime] = useState(0);
     const [songTimeParser, setSongTimeParser] = useState('00:00');
@@ -20,6 +20,20 @@ export default function Player() {
     const [_songSelected, _setSongSelected] = useState(songSelected)
 
     const prevSongSelected = useRef(null); // Store the previous songSelected value
+
+    function updateObjectInArray(array, conditionFunction, updateFunction) {
+        let tempArray = array.map((d) => {
+            const temp = { ...d }
+            temp.isPlaying = false
+            return temp
+        })
+        const targetIndex = tempArray.findIndex(conditionFunction);
+
+        if (targetIndex !== -1) {
+            tempArray[targetIndex] = updateFunction(tempArray[targetIndex]);
+        }
+        return tempArray
+    }
 
     const runSongTimer = () => {
         const stepper = 100 / songTimeMax;
@@ -37,6 +51,12 @@ export default function Player() {
                     dummySong['#'] = dummySong['#'] + 1
                     dispatch(setSongSelected(dummySong))
                     dispatch(setSongPlaying(true)); // Pause the song
+
+
+                    const condition = song => song['#'] === dummySong['#'];
+                    const jumpToNext = song => ({ ...song, isPlaying: true });
+                    const musicListUpdated = updateObjectInArray([...spotifyMusicList], condition, jumpToNext);
+                    dispatch(setSpotifyMusicList([...musicListUpdated]))
                     return 0;
                 }
                 // Update song time and progress
