@@ -11,7 +11,7 @@ import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/r
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
     const dispatch = useDispatch()
-    const { songSelected, spotifyMusicList } = useSelector((state) => state)
+    const { songSelected, spotifyMusicList, gradientColor } = useSelector((state) => state.spotify)
     const [playingIconOnHover, setPlayingIconOnHover] = useState(false)
     const [data, setData] = useState(spotifyMusicList)
 
@@ -34,8 +34,6 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
             const d = { ...dt }
             if (d.isPlaying && i !== songIdx) d.isPlaying = false
             if (i === songIdx) d.isPlaying = true
-            console.log(d)
-            console.log(i)
             return d
         })
         setData([...newData])
@@ -109,7 +107,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     ];
 
     return (
-        <div className='spotify-container' style={{ color: 'white' }}>
+        <div className='spotify-container' style={{ color: 'white', background: `linear-gradient(180deg, ${gradientColor[1]} 0%, rgba(18, 18, 18, 1) 10%)` }}>
             <SpotifyControllers />
             <Table
                 stickyHeader

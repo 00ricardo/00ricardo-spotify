@@ -12,7 +12,7 @@ import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/r
 export default function Player() {
     const dispatch = useDispatch()
     const songTimeMax = 250 // dummy example 03:23
-    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state)
+    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
     const [songTimeProgress, setSongTimeProgress] = useState(0);
     const [songTime, setSongTime] = useState(0);
     const [songTimeParser, setSongTimeParser] = useState('00:00');
@@ -109,7 +109,6 @@ export default function Player() {
         // only reset if we selected a different song to play
         if (prevSong !== newSong) {
             if (songPlaying) {
-                console.log(2)
                 // Reset timer progress
                 clearInterval(timerRef);
                 setTimerRef(null);

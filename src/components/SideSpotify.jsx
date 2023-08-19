@@ -9,10 +9,10 @@ import {
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFilterSelected, setSortdBy, setPlaylists } from '../redux/reducers/spotifyReducer';
+import { setFilterSelected, setSortdBy, setPlaylistsFiltered, setPlaylistSelected } from '../redux/reducers/spotifyReducer';
 function SideSpotify() {
     const dispatch = useDispatch()
-    const { filterSelected, playlists } = useSelector(state => state)
+    const { filterSelected, playlists } = useSelector(state => state.spotify)
     const [activateShadow, setActivateShadow] = useState(false)
     const [showSearchInput, setShowSearchInput] = useState(false)
     const [searchInput, setSearchInput] = useState('')
@@ -31,7 +31,7 @@ function SideSpotify() {
     const handleFiltering = (filter) => {
         dispatch(setFilterSelected(filter))
         const res = filterBy(playlists.base, filter)
-        dispatch(setPlaylists([...res]))
+        dispatch(setPlaylistsFiltered([...res]))
     }
 
 
@@ -53,21 +53,25 @@ function SideSpotify() {
             default:
                 break;
         }
-        dispatch(setPlaylists([...sorted]))
+        dispatch(setPlaylistsFiltered([...sorted]))
     }
 
     const handleDelete = () => {
         dispatch(setFilterSelected(null))
-        dispatch(setPlaylists([...playlists.base]))
+        dispatch(setPlaylistsFiltered([...playlists.base]))
     };
 
     const filterBy = (playlistBase, filter) => playlistBase.filter((p) => p.type.value === filter)
 
+    const handleSelectPlaylist = (playlist) => {
+        dispatch(setPlaylistSelected(playlist))
+    }
 
-    const renderSongs = (song, index) => {
+
+    const renderPlaylists = (song, index) => {
         return (
             <Fragment key={index}>
-                <ListItem component="div" disablePadding key={index}>
+                <ListItem component="div" disablePadding key={index} onClick={() => handleSelectPlaylist(song)}>
                     <ListItemButton
                         className='playlist-item'
                         style={{
@@ -126,10 +130,8 @@ function SideSpotify() {
         // Filter by Chip
         const lsFilteredBy = localStorage.getItem('filterSelected')
         if (lsFilteredBy !== 'null' && lsFilteredBy && playlists.base) {
-            console.log(lsFilteredBy)
-            console.log(playlists.base)
             res = filterBy(playlists.base, lsFilteredBy)
-            dispatch(setPlaylists([...res]))
+            dispatch(setPlaylistsFiltered([...res]))
         }
         // Filter by Search
         const _playlists = res.length > 0 ? [...res] : [...playlists.base]
@@ -138,7 +140,7 @@ function SideSpotify() {
             const _searchInput = searchInput.toUpperCase()
             return songName.includes(_searchInput)
         })
-        dispatch(setPlaylists([...res]))
+        dispatch(setPlaylistsFiltered([...res]))
     }, [dispatch, playlists.base, searchInput])
 
     useEffect(() => {
@@ -260,7 +262,7 @@ function SideSpotify() {
                         </Select>
                     </FormControl>
                 </div>
-                {playlists.filtered.length > 0 ? playlists.filtered.map((playlist, idx) => renderSongs(playlist, idx)) : renderKeywordWarning()}
+                {playlists.filtered.length > 0 ? playlists.filtered.map((playlist, idx) => renderPlaylists(playlist, idx)) : renderKeywordWarning()}
             </div>
         </div>
     )

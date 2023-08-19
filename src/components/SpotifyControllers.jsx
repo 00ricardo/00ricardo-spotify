@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
 
 function SpotifyControllers() {
-    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state)
+    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
     const [end, setEnd] = useState(false)
     const [anchorEl, setAnchorEl] = useState(null);
     const lottieRef = useRef(null);
