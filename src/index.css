@@ -232,9 +232,6 @@ a {
     margin-right: 7px !important;
 }
 
-.filter-badges:hover {
-    background-color: var(--spotify-container4) !important;
-}
 
 .MuiSelect-icon {
     color: var(--spotify-grey) !important;
@@ -244,10 +241,38 @@ a {
     background-color: var(--spotify-container3) !important;
 }
 
-.MuiPaper-root li:hover {
+.MuiPaper-root li:hover,
+.filter-badges:hover {
     background-color: var(--spotify-container4) !important;
 }
 
 .MuiPaper-root li[aria-selected="true"] {
     color: var(--spotify-green) !important;
+}
+
+.spotify-controller-icon:hover {
+    font-size: 72px;
+}
+
+.select-sorted-filter:hover,
+.MuiSelect-icon:hover {
+    color: var(--spotify-white) !important;
+}
+
+.css-1ua80n0-MuiInputBase-input-MuiOutlinedInput-input {
+    color: var(--spotify-grey) !important;
+}
+
+.search-keyword-warning {
+    width: 365px;
+    max-width: 365px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    justify-content: center;
+    height: 50vh;
+    margin: 0;
+    font-size: medium;
+    color: var(--spotify-white);
+    flex-direction: column;
 }

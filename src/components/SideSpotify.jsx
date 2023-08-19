@@ -15,6 +15,7 @@ function SideSpotify() {
     const { filterSelected, playlists } = useSelector(state => state)
     const [activateShadow, setActivateShadow] = useState(false)
     const [showSearchInput, setShowSearchInput] = useState(false)
+    const [searchInput, setSearchInput] = useState('')
     const filters = [
         { label: 'Recents', value: 'RECENTS' },
         { label: 'Recently added', value: 'RECENTLY_ADDED' },
@@ -63,7 +64,7 @@ function SideSpotify() {
     const filterBy = (playlistBase, filter) => playlistBase.filter((p) => p.type.value === filter)
 
 
-    function renderSongs(song, index) {
+    const renderSongs = (song, index) => {
         return (
             <Fragment key={index}>
                 <ListItem component="div" disablePadding key={index}>
@@ -106,16 +107,46 @@ function SideSpotify() {
         )
     }
 
+    const renderKeywordWarning = () => {
+        return (
+            <div className='search-keyword-warning'>
+                <h3 style={{ maxWidth: '365px', wordWrap: 'break-word' }}>
+                    Couldn't find "{`${searchInput}`}"
+                </h3>
+                <small>
+                    Try searching again using a
+                    different spelling or keyworkd.
+                </small>
+            </div>
+        )
+    }
 
     useEffect(() => {
+        let res = []
+        // Filter by Chip
         const lsFilteredBy = localStorage.getItem('filterSelected')
         if (lsFilteredBy !== 'null' && lsFilteredBy && playlists.base) {
             console.log(lsFilteredBy)
             console.log(playlists.base)
-            const res = filterBy(playlists.base, lsFilteredBy)
+            res = filterBy(playlists.base, lsFilteredBy)
             dispatch(setPlaylists([...res]))
         }
-    }, [dispatch, playlists.base])
+        // Filter by Search
+        const _playlists = res.length > 0 ? [...res] : [...playlists.base]
+        res = _playlists.filter(pl => {
+            const songName = pl.name.toUpperCase()
+            const _searchInput = searchInput.toUpperCase()
+            return songName.includes(_searchInput)
+        })
+        dispatch(setPlaylists([...res]))
+    }, [dispatch, playlists.base, searchInput])
+
+    useEffect(() => {
+
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchInput])
+
     return (
         <div className='side-spotify container-1'>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -160,22 +191,53 @@ function SideSpotify() {
             </div>
             <div ref={trackListRef} className='track-list' onScroll={(e) => handleShadowBox(e)}>
                 <div style={{ display: 'flex' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '50%' }}>
-                        {showSearchInput ? <TextField
-                            size="small"
-                            style={{ color: 'var(--spotify-grey)', background: 'var(--spotify-container4)' }}
-                            placeholder='Search in Your Library'
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <Search />
-                                    </InputAdornment>
-                                ),
-                            }}
-                        /> : <Search />}
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '60%'
+                    }}>
+                        {showSearchInput ?
+                            <TextField
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                className='search-input'
+                                onBlur={() => setShowSearchInput(false)}
+                                size="small"
+                                style={{
+                                    color: 'red',
+                                    borderRadius: '5px',
+                                    background: 'var(--spotify-container3)'
+                                }}
+                                placeholder='Search in Your Library'
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment
+                                            style={{ color: 'red' }}
+                                            position="start">
+                                            <IconButton
+                                                style={{ paddingLeft: '0px', color: 'var(--spotify-grey)' }}
+                                            >
+                                                <Search />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            /> :
+                            <Tooltip title="Search in Your Library">
+                                <IconButton
+                                    onClick={() => setShowSearchInput(true)}
+                                    size="medium"
+                                    style={{ color: 'var(--spotify-grey)' }}
+                                >
+                                    <Search fontSize="inherit" />
+                                </IconButton>
+                            </Tooltip>
+                        }
                     </div>
                     <FormControl size="small">
                         <Select
+                            className='select-sorted-filter'
                             onChange={(e) => handleSortedByFilter(e)}
                             defaultValue="RECENTS"
                             style={{
@@ -198,7 +260,7 @@ function SideSpotify() {
                         </Select>
                     </FormControl>
                 </div>
-                {playlists.filtered.map((playlist, idx) => renderSongs(playlist, idx))}
+                {playlists.filtered.length > 0 ? playlists.filtered.map((playlist, idx) => renderSongs(playlist, idx)) : renderKeywordWarning()}
             </div>
         </div>
     )

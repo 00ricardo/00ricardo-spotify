@@ -71,6 +71,11 @@ function SpotifyControllers() {
         dispatch(setSongPlaying(false))
     }
 
+    const handleSong = (songPlaying) => {
+        if (songPlaying) handlePauseSong()
+        if (!songPlaying) handlePlaySong()
+    }
+
     const open = Boolean(anchorEl);
     const id = open ? 'simple-popover' : undefined;
 
@@ -81,23 +86,25 @@ function SpotifyControllers() {
 
     return (
         <div className='spotify-main-controlers'>
-            {songPlaying ?
-                <PauseCircle
-                    onClick={() => handlePauseSong()}
-                    sx={{ fontSize: 70 }}
-                    fontSize='large'
-                    style={{
-                        color: 'var(--spotify-green)',
-                        paddingRight: '15px'
-                    }} /> :
-                <PlayCircle
-                    onClick={() => handlePlaySong()}
-                    sx={{ fontSize: 70 }}
-                    fontSize='large'
-                    style={{
-                        color: 'var(--spotify-green)',
-                        paddingRight: '15px'
-                    }} />}
+            <IconButton onClick={() => handleSong(songPlaying)}>
+                {songPlaying ?
+                    <PauseCircle
+                        className='spotify-controller-icon'
+                        sx={{ fontSize: 70 }}
+                        fontSize='large'
+                        style={{
+                            color: 'var(--spotify-green)',
+                            paddingRight: '15px'
+                        }} /> :
+                    <PlayCircle
+                        className='spotify-controller-icon'
+                        sx={{ fontSize: 70 }}
+                        fontSize='large'
+                        style={{
+                            color: 'var(--spotify-green)',
+                            paddingRight: '15px'
+                        }} />}
+            </IconButton>
             <Tooltip title="Save to Your Library">
                 <IconButton className='like-btn' onClick={startLikeAnimation}>
                     <LootieLikeButton
