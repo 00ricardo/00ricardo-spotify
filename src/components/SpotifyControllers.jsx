@@ -54,7 +54,8 @@ function SpotifyControllers() {
         }
 
         dispatch(setSpotifyMusicList([..._data]))
-        const updateSongSelected = { ...songSelected, isPlaying: true }
+        const _songSelected = Object.keys(songSelected).length !== 0 ? { ...songSelected } : { ...spotifyMusicList[0] }
+        const updateSongSelected = { ..._songSelected, isPlaying: true }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(true))
     }
@@ -66,7 +67,8 @@ function SpotifyControllers() {
             return obj
         })
         dispatch(setSpotifyMusicList([...newData]))
-        const updateSongSelected = { ...songSelected, isPlaying: false }
+        const _songSelected = Object.keys(songSelected).length !== 0 ? { ...songSelected } : { ...spotifyMusicList[0] }
+        const updateSongSelected = { ..._songSelected, isPlaying: false }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(false))
     }
@@ -93,16 +95,14 @@ function SpotifyControllers() {
                         sx={{ fontSize: 70 }}
                         fontSize='large'
                         style={{
-                            color: 'var(--spotify-green)',
-                            paddingRight: '15px'
+                            color: 'var(--spotify-green)'
                         }} /> :
                     <PlayCircle
                         className='spotify-controller-icon'
                         sx={{ fontSize: 70 }}
                         fontSize='large'
                         style={{
-                            color: 'var(--spotify-green)',
-                            paddingRight: '15px'
+                            color: 'var(--spotify-green)'
                         }} />}
             </IconButton>
             <Tooltip title="Save to Your Library">

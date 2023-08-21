@@ -38,8 +38,7 @@ function Sidebar() {
         dispatch(setPlaylistsFiltered(ready))
     }
 
-    // eslint-disable-next-line no-unused-vars
-    const { data, error, isLoading } = useQuery({
+    useQuery({
         queryKey: ['spotify-playlists'],
         enabled: true, // Enable the query immediately
         queryFn: () => playlistEndpoints.getMyPlaylists(authenticationSettings),

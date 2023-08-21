@@ -1,26 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
-import likedSongsImg from '../../public/img/spotify-liked-songs.png'
 const initialState = {
   spotify: {
     playlists: {
-      base: [
-        { name: 'Liked Songs', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo', src: likedSongsImg },
-        { name: 'Runaljod', type: { label: 'Album', value: 'ALBUM' }, owner: 'Wardruna' },
-        { name: 'Spheres', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
-        { name: 'Ed Steele', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
-        { name: 'Three Days Grace', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
-        { name: 'Progressive Techno V1', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
-        { name: 'Progressive Techno V2', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' }
-      ],
-      filtered: [
-        { name: 'Liked Songs', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo', src: likedSongsImg },
-        { name: 'Runaljod', type: { label: 'Album', value: 'ALBUM' }, owner: 'Wardruna' },
-        { name: 'Spheres', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
-        { name: 'Ed Steele', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
-        { name: 'Three Days Grace', type: { label: 'Artist', value: 'ARTIST' }, owner: '' },
-        { name: 'Progressive Techno V1', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' },
-        { name: 'Progressive Techno V2', type: { label: 'Playlist', value: 'PLAYLIST' }, owner: 'Ricardo' }
-      ]
+      base: [],
+      filtered: []
     },
     playlistSelected: {
       "id": "1pGyuBcZrhHvJfUXLg2gmu",
@@ -40,127 +23,100 @@ const initialState = {
     },
     songSelected: {
       "#": 1,
-      title: null,
-      plays: "IN",
-      time: 1324171354,
-      isPlaying: false
+      "track_id": "4b2rlKIqyLxpxoIaG7sZ5K",
+      "title": {
+        "type": "div",
+        "key": null,
+        "ref": null,
+        "props": {
+          "style": {
+            "display": "flex",
+            "alignItems": "center"
+          },
+          "children": [
+            {
+              "type": {
+                "propTypes": {}
+              },
+              "key": null,
+              "ref": null,
+              "props": {
+                "style": {
+                  "height": "40px",
+                  "width": "40px"
+                },
+                "variant": "square",
+                "src": "https://i.scdn.co/image/ab67616d0000b2732f952feea610a910c7daf561"
+              },
+              "_owner": null,
+              "_store": {}
+            },
+            {
+              "type": "div",
+              "key": null,
+              "ref": null,
+              "props": {
+                "style": {
+                  "paddingLeft": "20px"
+                },
+                "children": [
+                  {
+                    "type": "div",
+                    "key": null,
+                    "ref": null,
+                    "props": {
+                      "style": {
+                        "paddingBottom": "5px",
+                        "color": "var(--spotify-white)"
+                      },
+                      "children": "Save Me"
+                    },
+                    "_owner": null,
+                    "_store": {}
+                  },
+                  {
+                    "type": "div",
+                    "key": null,
+                    "ref": null,
+                    "props": {
+                      "style": {
+                        "color": "var(--spotify-grey)"
+                      },
+                      "children": "Anyma, Cassian, Poppy Baskcomb"
+                    },
+                    "_owner": null,
+                    "_store": {}
+                  }
+                ]
+              },
+              "_owner": null,
+              "_store": {}
+            }
+          ]
+        },
+        "_owner": null,
+        "_store": {}
+      },
+      "name": "Save Me",
+      "album": "Genesys",
+      "artists": ["Anyma", "Cassian", "Poppy Baskcomb"],
+      "added_at": "Aug 11, 2023",
+      "time": 189.783,
+      "formatedTime": "03:09",
+      "isPlaying": false,
+      "src": {
+        "height": 640,
+        "url": "https://i.scdn.co/image/ab67616d0000b2732f952feea610a910c7daf561",
+        "width": 640
+      },
+      "saved": false
     },
     songPlaying: false,
     filterSelected: null,
     sortedBy: 'RECENTS',
-    spotifyMusicList: [
-      {
-        "#": 1,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "IN",
-        "time": 1324171354,
-        "isPlaying": false
-      },
-      {
-        "#": 2,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "CN",
-        "time": 1403500365,
-        "isPlaying": false
-      },
-      {
-        "#": 3,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "IT",
-        "time": 60483973,
-        "isPlaying": false
-      },
-      {
-        "#": 4,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "US",
-        "time": 327167434,
-        "isPlaying": false
-      },
-      {
-        "#": 5,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "CA",
-        "time": 37602103,
-        "isPlaying": false
-      },
-      {
-        "#": 6,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "AU",
-        "time": 25475400,
-        "isPlaying": false
-      },
-      {
-        "#": 7,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "DE",
-        "time": 83019200,
-        "isPlaying": false
-      },
-      {
-        "#": 8,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "IE",
-        "time": 4857000,
-        "isPlaying": false
-      },
-      {
-        "#": 9,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "MX",
-        "time": 126577691,
-        "isPlaying": false
-      },
-      {
-        "#": 10,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "JP",
-        "time": 126317000,
-        "isPlaying": false
-      },
-      {
-        "#": 11,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "FR",
-        "time": 67022000,
-        "isPlaying": false
-      },
-      {
-        "#": 12,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "GB",
-        "time": 67545757,
-        "isPlaying": false
-      },
-      {
-        "#": 13,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "RU",
-        "time": 146793744,
-        "isPlaying": false
-      },
-      {
-        "#": 14,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "NG",
-        "time": 200962417,
-        "isPlaying": false
-      },
-      {
-        "#": 15,
-        "title": null, "name": "Dummy Music Name",
-        "plays": "BR",
-        "time": 210147125,
-        "isPlaying": false
-      }
-    ],
-    gradientColor: {
-      header: ['#1A1919', '#1A1919', '#1A1919'],
-      list: ['#1A1919', '#1A1919', '#1A1919']
-    }
+    spotifyMusicList: [],
+    gradientColor: ['#1A1919', '#1A1919', '#1A1919']
   },
-
 };
 
 const setPlaylistsBaseReducer = (state, action) => {
@@ -192,24 +148,28 @@ const setSongPlayingReducer = (state, action) => {
   const value = action.payload ?? false;
   const _state = state.spotify
   _state.songPlaying = value
+  localStorage.setItem('songPlaying', JSON.stringify(value))
 }
 
 const setSongSelectedReducer = (state, action) => {
   const value = action.payload ? { ...action.payload } : {};
   const _state = state.spotify
   _state.songSelected = value
+  //localStorage.setItem('songSelected', JSON.stringify(value))
 }
 
 const setSpotifyMusicListReducer = (state, action) => {
   const value = action.payload ? [...action.payload] : [];
   const _state = state.spotify
   _state.spotifyMusicList = value
+  localStorage.setItem('spotifyMusicList', JSON.stringify(value))
 }
 
 const setPlaylistSelectedReducer = (state, action) => {
   const value = action.payload ? { ...action.payload } : {};
   const _state = state.spotify
   _state.playlistSelected = value
+  localStorage.setItem('playlistSelected', JSON.stringify(value))
 }
 
 const setGradientColorReducer = (state, action) => {

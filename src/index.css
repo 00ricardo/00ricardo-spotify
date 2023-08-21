@@ -288,3 +288,13 @@ a {
 .MuiAlert-filledError {
     background-color: var(--spotify-red) !important;
 }
+
+.playlist-owner {
+    color: var(--spotify-white);
+    text-decoration: none;
+    outline: none;
+}
+
+.playlist-owner:hover {
+    text-decoration: underline
+}

@@ -11,8 +11,8 @@ import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/r
 
 export default function Player() {
     const dispatch = useDispatch()
-    const songTimeMax = 250 // dummy example 03:23
     const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
+    const songTimeMax = Math.floor(songSelected.time) // dummy example 03:23
     const [songTimeProgress, setSongTimeProgress] = useState(0);
     const [songTime, setSongTime] = useState(0);
     const [songTimeParser, setSongTimeParser] = useState('00:00');

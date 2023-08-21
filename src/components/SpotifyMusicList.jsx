@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import SpotifyControllers from './SpotifyControllers';
 import {
     TableBody, Table,
-    TableRow, TableHead, TableCell, Avatar
+    TableRow, TableHead, TableCell
 } from '@mui/material';
 import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Audio } from 'react-loader-spinner'
 import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
+import CustomButtonWrapper from './CustomSpotifyLikeWrapper';
 
 function SpotifyMusicList({ headerRef, headerStyle }) {
     const dispatch = useDispatch()
@@ -41,6 +42,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
         const updateSongSelected = { ...songObj, isPlaying: true }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(true))
+        console.log(updateSongSelected)
     }
 
     const handlePauseSong = (songObj, songIdx) => {
@@ -58,43 +60,6 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     }
 
     useEffect(() => {
-        const _data = [...data]
-        const completeData = _data.map((d, i) => {
-            let obj = { ...d }
-            obj.title =
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Avatar
-                        style={{
-                            height: '40px',
-                            width: '40px',
-                        }}
-                        variant='square'
-                        src="https://upload.wikimedia.org/wikipedia/commons/3/37/Music_Of_The_Spheres_%28Album%29_2021.jpg"
-                    />
-                    <div style={{ paddingLeft: '20px' }}>
-                        <div style={{
-                            paddingBottom: '5px',
-                            color: d.isPlaying ?
-                                'var(--spotify-green)' :
-                                'var(--spotify-white)'
-                        }}>
-                            {d.name}
-                        </div>
-                        <div style={{
-                            color: d.isPlaying ? 'var(--spotify-white)' : 'var(--spotify-grey)'
-                        }}>
-                            Coldplay
-                        </div>
-                    </div>
-                </div>
-            return obj
-        })
-        setData(completeData)
-        dispatch(setSpotifyMusicList(completeData))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    useEffect(() => {
         const _data = [...spotifyMusicList]
         setData(_data)
     }, [spotifyMusicList])
@@ -102,8 +67,10 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
     const columns = [
         { id: '#', label: '#' },
         { id: 'title', label: 'Title' },
-        { id: 'plays', label: 'Plays' },
-        { id: 'time', label: <AccessTime />, minWidth: 100 },
+        { id: 'album', label: 'Album' },
+        { id: 'added_at', label: 'Date added' },
+        { id: 'spotifyLike', label: '' },
+        { id: 'formatedTime', label: <AccessTime />, minWidth: 100 },
     ];
 
     return (
@@ -121,9 +88,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                 key={idx}
                                 align={column.align}
                                 style={{
-                                    padding: 0,
-                                    minWidth: idx === 2 ? '185px' : 'auto',
-                                    width: idx === 1 ? '600px' : idx === 2 ? '-webkit-fill-available' : '0px',
+                                    padding: '5px',
                                     backgroundColor: headerStyle ? 'var(--spotify-container3)' : 'transparent',
                                     color: 'var(--spotify-grey)'
                                 }}
@@ -136,7 +101,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                 <TableBody
                     sx={{
                         '& .MuiTableRow-root:hover': {
-                            backgroundColor: 'var(--spotify-container3)'
+                            backgroundColor: '#8584846e'
                         }
                     }}
                 >
@@ -152,7 +117,13 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                 {columns.map((column, idx) => {
                                     const value = row[column.id];
                                     return (
-                                        <TableCell key={idx} align={column.align} style={{ color: 'white', borderBottom: 'none', width: column.id === '#' ? '25px' : 'inherit' }}>
+                                        <TableCell key={idx} align={column.align}
+                                            style={{
+                                                padding: '5px',
+                                                color: 'var(--spotify-grey)',
+                                                borderBottom: 'none',
+                                                width: column.id === '#' ? '25px' : 'inherit'
+                                            }}>
                                             {column.format && typeof value === 'number'
                                                 ? column.format(value)
                                                 : column.id === '#' &&
@@ -168,7 +139,7 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                     /> : column.id === '#' &&
                                                         (row['#'] === songSelected['#'] && songSelected.isPlaying) ? <Pause onClick={() => handlePauseSong(row, index)} /> :
                                                         <div style={{
-                                                            fontWeight: 'bold',
+                                                            //fontWeight: 'bold',
                                                             color: column.id === '#' &&
                                                                 songSelected['#'] === row['#'] ?
                                                                 'var(--spotify-green)' : 'inherit'
@@ -177,7 +148,20 @@ function SpotifyMusicList({ headerRef, headerStyle }) {
                                                                 (row['#'] !== songSelected['#'] || !songSelected.isPlaying) &&
                                                                 playingIconOnHover[index]
                                                                 ? <PlayArrow onClick={() => handlePlaySong(row, index)} /> :
-                                                                value}
+                                                                column.id === 'added_at' && playingIconOnHover[index] && !row.saved ?
+                                                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                        {value}
+                                                                        <CustomButtonWrapper track_id={row.track_id} />
+                                                                    </div> :
+                                                                    column.id === 'added_at' && row.saved ?
+                                                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                            {value}
+                                                                            <CustomButtonWrapper track_id={row.track_id} />
+                                                                        </div>
+                                                                        : value}
+
+
+
                                                         </div>
                                             }
                                         </TableCell>

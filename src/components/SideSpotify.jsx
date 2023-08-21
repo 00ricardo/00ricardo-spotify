@@ -143,11 +143,6 @@ function SideSpotify() {
         dispatch(setPlaylistsFiltered([...res]))
     }, [dispatch, playlists.base, searchInput])
 
-    useEffect(() => {
-
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchInput])
 
     return (
         <div className='side-spotify container-1'>
