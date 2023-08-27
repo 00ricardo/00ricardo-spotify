@@ -4,7 +4,7 @@ import { PictureInPictureAlt } from '@mui/icons-material';
 import SpotifyLike from '../public/lotties/spotify-like.json'
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
+import { setSongSelected } from '../redux/reducers/spotifyReducer';
 function PlayerTrack() {
     const { songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
     const [end, setEnd] = useState(false)
@@ -25,7 +25,6 @@ function PlayerTrack() {
             const songIdx = tempArray.findIndex((s, i) => s.track_id === _songSelected.track_id)
             if (songIdx !== -1) {
                 tempArray[songIdx] = { ...tempArray[songIdx], saved: !tempArray[songIdx].saved };
-                dispatch(setSpotifyMusicList([...tempArray]))
             }
         }
     };
@@ -37,7 +36,6 @@ function PlayerTrack() {
     };
 
     const transformArtistsData = (artists) => {
-        console.log(artists)
         return (
             <Fragment >
                 {artists.map((art, i) => (

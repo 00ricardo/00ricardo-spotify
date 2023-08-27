@@ -22,92 +22,20 @@ const initialState = {
       "src": "https://images-ak.spotifycdn.com/image/ab67706c0000bebbf209a817ae2e41704c3cf988"
     },
     songSelected: {
-      "#": 1,
-      "track_id": "4b2rlKIqyLxpxoIaG7sZ5K",
-      "title": {
-        "type": "div",
-        "key": null,
-        "ref": null,
-        "props": {
-          "style": {
-            "display": "flex",
-            "alignItems": "center"
-          },
-          "children": [
-            {
-              "type": {
-                "propTypes": {}
-              },
-              "key": null,
-              "ref": null,
-              "props": {
-                "style": {
-                  "height": "40px",
-                  "width": "40px"
-                },
-                "variant": "square",
-                "src": "https://i.scdn.co/image/ab67616d0000b2732f952feea610a910c7daf561"
-              },
-              "_owner": null,
-              "_store": {}
-            },
-            {
-              "type": "div",
-              "key": null,
-              "ref": null,
-              "props": {
-                "style": {
-                  "paddingLeft": "20px"
-                },
-                "children": [
-                  {
-                    "type": "div",
-                    "key": null,
-                    "ref": null,
-                    "props": {
-                      "style": {
-                        "paddingBottom": "5px",
-                        "color": "var(--spotify-white)"
-                      },
-                      "children": "Save Me"
-                    },
-                    "_owner": null,
-                    "_store": {}
-                  },
-                  {
-                    "type": "div",
-                    "key": null,
-                    "ref": null,
-                    "props": {
-                      "style": {
-                        "color": "var(--spotify-grey)"
-                      },
-                      "children": "Anyma, Cassian, Poppy Baskcomb"
-                    },
-                    "_owner": null,
-                    "_store": {}
-                  }
-                ]
-              },
-              "_owner": null,
-              "_store": {}
-            }
-          ]
-        },
-        "_owner": null,
-        "_store": {}
-      },
-      "name": "Save Me",
-      "album": "Genesys",
-      "artists": ["Anyma", "Cassian", "Poppy Baskcomb"],
-      "added_at": "Aug 11, 2023",
-      "time": 189.783,
-      "formatedTime": "03:09",
+      "#": null,
+      "track_id": '',
+      "title": {},
+      "name": '',
+      "album": '',
+      "artists": [],
+      "added_at": '',
+      "time": null,
+      "formatedTime": '',
       "isPlaying": false,
       "src": {
-        "height": 640,
-        "url": "https://i.scdn.co/image/ab67616d0000b2732f952feea610a910c7daf561",
-        "width": 640
+        "height": null,
+        "url": '',
+        "width": null
       },
       "saved": false
     },
@@ -115,9 +43,18 @@ const initialState = {
     filterSelected: null,
     sortedBy: 'RECENTS',
     spotifyMusicList: [],
-    gradientColor: ['#1A1919', '#1A1919', '#1A1919']
+    gradientColor: ['#1A1919', '#1A1919', '#1A1919'],
+    openSnackbar: false,
+    checkPreview: { song: null, check: false },
+    initialVolume: 1
   },
 };
+
+const setInitialVolumeReducer = (state, action) => {
+  const value = action.payload ? action.payload : 1;
+  const _state = state.spotify
+  _state.initialVolume = value
+}
 
 const setPlaylistsBaseReducer = (state, action) => {
   const value = action.payload ? [...action.payload] : [];
@@ -145,10 +82,36 @@ const setSortdByReducer = (state, action) => {
   localStorage.setItem('sortedBy', value)
 }
 const setSongPlayingReducer = (state, action) => {
-  const value = action.payload ?? false;
-  const _state = state.spotify
-  _state.songPlaying = value
-  localStorage.setItem('songPlaying', JSON.stringify(value))
+  try {
+    let newData = []
+    const value = action.payload ?? false;
+    const _state = state.spotify
+    const spotifyMusicList = [..._state.spotifyMusicList]
+    const songSelected = { ..._state.songSelected }
+
+    if (!value) {
+      newData = spotifyMusicList.map((d, i) => {
+        const obj = { ...d, isPlaying: value }
+        return obj
+      })
+    } else {
+      const songIdx = songSelected['#']
+      const _songIdx = spotifyMusicList.findIndex((d, i) => d['#'] === songIdx)
+      if (_songIdx !== -1) {
+        spotifyMusicList[_songIdx] = { ...songSelected, isPlaying: value }
+      }
+      newData = [...spotifyMusicList]
+    }
+
+    _state.songPlaying = value
+    _state.songSelected = { ...songSelected, isPlaying: value }
+    _state.spotifyMusicList = [...newData]
+
+    localStorage.setItem('songPlaying', JSON.stringify(value))
+  } catch (error) {
+    console.log(error)
+  }
+
 }
 
 const setSongSelectedReducer = (state, action) => {
@@ -178,6 +141,17 @@ const setGradientColorReducer = (state, action) => {
   _state.gradientColor = value
 }
 
+const setOpenSnackbarReducer = (state, action) => {
+  const value = action.payload ? action.payload : false;
+  const _state = state.spotify
+  _state.openSnackbar = value
+}
+
+const setCheckPreviewReducer = (state, action) => {
+  const value = action.payload ? { ...action.payload } : { song: null, check: false };
+  const _state = state.spotify
+  _state.checkPreview = value
+}
 
 const SpotifySlice = createSlice({
   name: 'spotify',
@@ -191,7 +165,10 @@ const SpotifySlice = createSlice({
     setSongSelected: setSongSelectedReducer,
     setSpotifyMusicList: setSpotifyMusicListReducer,
     setPlaylistSelected: setPlaylistSelectedReducer,
-    setGradientColor: setGradientColorReducer
+    setGradientColor: setGradientColorReducer,
+    setOpenSnackbar: setOpenSnackbarReducer,
+    setCheckPreview: setCheckPreviewReducer,
+    setInitialVolume: setInitialVolumeReducer
   }
 });
 
@@ -204,7 +181,10 @@ export const {
   setSongSelected,
   setSpotifyMusicList,
   setPlaylistSelected,
-  setGradientColor
+  setGradientColor,
+  setOpenSnackbar,
+  setCheckPreview,
+  setInitialVolume
 } = SpotifySlice.actions;
 
 export default SpotifySlice.reducer;

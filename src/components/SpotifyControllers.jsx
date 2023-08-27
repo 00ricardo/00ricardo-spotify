@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 import SpotifyLike from '../public/lotties/spotify-like.json'
 import { useDispatch, useSelector } from 'react-redux';
-import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
+import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
 
 function SpotifyControllers() {
     const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
@@ -46,6 +46,7 @@ function SpotifyControllers() {
     };
 
     const handlePlaySong = () => {
+        const audio = document.getElementById('audio-element-controller')
         const _data = [...spotifyMusicList]
         const songIdx = songSelected['#']
         const _songIdx = _data.findIndex((d, i) => d['#'] === songIdx)
@@ -53,24 +54,20 @@ function SpotifyControllers() {
             _data[_songIdx] = { ...songSelected, isPlaying: true }
         }
 
-        dispatch(setSpotifyMusicList([..._data]))
         const _songSelected = Object.keys(songSelected).length !== 0 ? { ...songSelected } : { ...spotifyMusicList[0] }
-        const updateSongSelected = { ..._songSelected, isPlaying: true }
+        const updateSongSelected = { ..._songSelected }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(true))
+        if (audio) audio.play()
     }
 
     const handlePauseSong = () => {
-        const _data = [...spotifyMusicList]
-        const newData = _data.map((d, i) => {
-            const obj = { ...d, isPlaying: false }
-            return obj
-        })
-        dispatch(setSpotifyMusicList([...newData]))
+        const audio = document.getElementById('audio-element-controller')
         const _songSelected = Object.keys(songSelected).length !== 0 ? { ...songSelected } : { ...spotifyMusicList[0] }
-        const updateSongSelected = { ..._songSelected, isPlaying: false }
+        const updateSongSelected = { ..._songSelected }
         dispatch(setSongSelected(updateSongSelected))
         dispatch(setSongPlaying(false))
+        if (audio) audio.pause()
     }
 
     const handleSong = (songPlaying) => {

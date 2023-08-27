@@ -240,6 +240,10 @@ a {
     background-color: var(--spotify-container3) !important;
 }
 
+.css-11uz2jy-MuiPaper-root-MuiAlert-root {
+    background-color: rgb(237, 170, 170) !important;
+}
+
 .MuiPaper-root li:hover,
 .filter-badges:hover {
     background-color: var(--spotify-container4) !important;
@@ -297,4 +301,8 @@ a {
 
 .playlist-owner:hover {
     text-decoration: underline
+}
+
+#audio-element-controller {
+    display: none;
 }

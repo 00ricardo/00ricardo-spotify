@@ -7,7 +7,7 @@ import {
     Shuffle, Repeat, Pause
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setSongPlaying, setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
+import { setSongPlaying, setSongSelected, setCheckPreview } from '../redux/reducers/spotifyReducer';
 
 export default function Player() {
     const dispatch = useDispatch()
@@ -18,26 +18,25 @@ export default function Player() {
     const [songTimeParser, setSongTimeParser] = useState('00:00');
     const [timerRef, setTimerRef] = useState(null);
     const [_songSelected, _setSongSelected] = useState(songSelected)
-
     const prevSongSelected = useRef(null); // Store the previous songSelected value
 
-    function updateObjectInArray(array, conditionFunction, updateFunction) {
-        let tempArray = array.map((d) => {
-            const temp = { ...d }
-            temp.isPlaying = false
-            return temp
-        })
-        const targetIndex = tempArray.findIndex(conditionFunction);
 
-        if (targetIndex !== -1) {
-            tempArray[targetIndex] = updateFunction(tempArray[targetIndex]);
+    const jumpToNextSong = () => {
+        const currentSong = { ...songSelected }
+        const availableSongs = [...spotifyMusicList]
+        let nextSong = availableSongs.find((song) => song['#'] === currentSong['#'] + 1)
+        if (!nextSong) {
+            nextSong = availableSongs.find((song) => song['#'] === 1)
+            dispatch(setSongPlaying(false))
         }
-        return tempArray
+        dispatch(setCheckPreview({ song: nextSong, check: true }))
     }
+
 
     const runSongTimer = () => {
         const stepper = 100 / songTimeMax;
         const timer = setInterval(() => {
+
             // When song ends
             setSongTime((oldTimer) => {
                 if (oldTimer === songTimeMax) {
@@ -45,23 +44,28 @@ export default function Player() {
                     setTimerRef(null);
                     setSongTimeParser('00:00');
                     setSongTimeProgress(0); // Reset progress
-
-                    //Jump to next song
-                    const dummySong = { ...songSelected }
-                    dummySong['#'] = dummySong['#'] + 1
-                    dispatch(setSongSelected(dummySong))
-                    dispatch(setSongPlaying(true)); // Pause the song
-
-
-                    const condition = song => song['#'] === dummySong['#'];
-                    const jumpToNext = song => ({ ...song, isPlaying: true });
-                    const musicListUpdated = updateObjectInArray([...spotifyMusicList], condition, jumpToNext);
-                    dispatch(setSpotifyMusicList([...musicListUpdated]))
+                    jumpToNextSong()
                     return 0;
                 }
+
                 // Update song time and progress
-                setSongTimeParser(formatTime(oldTimer + 1));
-                setSongTimeProgress((oldProgress) => oldProgress + stepper);
+                const _oldTimer = oldTimer + (songTimeMax - 29) === songTimeMax - 29 ? songTimeMax - 29 : oldTimer + (songTimeMax - 29)
+
+                setSongTimeParser(formatTime(_oldTimer + 1));
+
+                setSongTimeProgress((oldProgress) => {
+
+                    //Jump to next Song
+                    if (oldProgress >= 100) {
+                        jumpToNextSong()
+                        return 0
+                    } else {
+                        const _oldTimer = oldProgress + stepper === stepper ? ((songTimeMax - 29) * 100) / songTimeMax : oldProgress
+                        return _oldTimer + stepper
+                    }
+
+                });
+
                 return oldTimer + 1;
             });
         }, 1000);
@@ -81,12 +85,14 @@ export default function Player() {
     // Function to play or pause the song
     const playOrPause = () => {
         const _data = [...spotifyMusicList]
+        const audio = document.getElementById('audio-element-controller')
         let newData = null
         if (songSelected.isPlaying) {
             newData = _data.map((d, i) => {
                 const obj = { ...d, isPlaying: false }
                 return obj
             })
+            if (audio) audio.pause()
 
         } else {
             const songIdx = songSelected['#']
@@ -95,10 +101,9 @@ export default function Player() {
                 _data[_songIdx] = { ...songSelected, isPlaying: true }
             }
             newData = [..._data]
+            if (audio) audio.play()
         }
-        dispatch(setSpotifyMusicList([...newData]))
-        const updateSongSelected = { ...songSelected, isPlaying: !songSelected.isPlaying }
-        dispatch(setSongSelected(updateSongSelected))
+
         dispatch(setSongPlaying(!songSelected.isPlaying)); // Play the song
     };
 
@@ -163,6 +168,7 @@ export default function Player() {
                 </span>
                 {formatTime(songTimeMax)}
             </div>
+
         </div>
     );
 }

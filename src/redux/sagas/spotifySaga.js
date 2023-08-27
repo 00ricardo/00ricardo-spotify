@@ -5,7 +5,6 @@ function* SpotifySagaHandler(action) {
     try {
         // eslint-disable-next-line no-unused-vars
         const data = yield action.payload
-        //console.log(data)
     } catch (error) {
         console.error(error)
     }

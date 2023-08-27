@@ -18,15 +18,6 @@ function SpotifyHeader() {
     const authenticationSettings = JSON.parse(localStorage.getItem('authentication'))
     const { colors } = useImageColor(src, { cors: true, colors: 2 })
 
-    const parseArtists = (artists) => {
-        let _artists = ''
-        let arrayLength = artists.length
-        artists.forEach((art, i) => {
-            _artists = `${_artists}${art.name}${i + 1 !== arrayLength ? ', ' : ''}`
-        });
-        return _artists
-    }
-
     const transformArtistsData = (artists) => {
         return (
             <Fragment >
@@ -138,6 +129,7 @@ function SpotifyHeader() {
         onSuccess: (data) => {
             const _data = { ...data }
             prepareData(_data)
+            console.log(data)
         }
     });
 

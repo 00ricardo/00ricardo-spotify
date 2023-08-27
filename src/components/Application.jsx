@@ -5,10 +5,14 @@ import Spotify from './Spotify';
 import { useQuery } from '@tanstack/react-query';
 import authEndpoints from '../services/endpoints/auth'
 import { TailSpin } from 'react-loader-spinner'
-import { Avatar, } from '@mui/material';
+import { Avatar, Alert, Snackbar } from '@mui/material';
 import spotifyLogo from '../public/img/spotify-logo.png'
-import Alert from '@mui/material/Alert';
+import { useDispatch, useSelector } from 'react-redux';
+import { setOpenSnackbar } from '../redux/reducers/spotifyReducer';
 function Application() {
+
+  const dispatch = useDispatch()
+  const { openSnackbar } = useSelector((state) => state.spotify)
 
   function wait(callback, milliseconds) {
     return new Promise((resolve, reject) => {
@@ -37,6 +41,27 @@ function Application() {
       localStorage.setItem('authentication', JSON.stringify(data))
     }
   });
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    dispatch(setOpenSnackbar(false));
+  };
+
+  const SnackbarPreviewURLNull = () => (
+    <Snackbar
+      open={openSnackbar}
+      autoHideDuration={10000}
+      onClose={handleCloseSnackbar}>
+      <Alert
+        severity='error'
+        onClose={handleCloseSnackbar}
+        sx={{ width: '100%', color: 'var(--spotify-red)' }}>
+        This song doesn't have a preview. Please try another song.
+      </Alert>
+    </Snackbar>
+  )
 
   if (isLoading) return (
     <div className='spotify-loading'>
@@ -75,6 +100,7 @@ function Application() {
         <Spotify />
       </div>
       <PlayBar />
+      {openSnackbar && <SnackbarPreviewURLNull />}
     </div>
   )
 
