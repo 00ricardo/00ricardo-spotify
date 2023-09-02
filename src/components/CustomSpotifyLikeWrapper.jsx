@@ -50,14 +50,14 @@ function CustomButtonWrapper({ track_id }) {
     };
 
     return (
-        <button className='like-btn' onClick={startLikeAnimation}>
+        <div onClick={startLikeAnimation} style={{ cursor: 'pointer' }}>
             <LootieLikeButton
                 ref={lottieRef}
                 src={SpotifyLike}
                 style={{ height: 35, color: 'var(--spotify-grey)' }}
                 onEvent={handleEventPlayer}
             />
-        </button>
+        </div>
     );
 };
 

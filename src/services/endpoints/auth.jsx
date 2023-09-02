@@ -1,15 +1,13 @@
-import settings from '../spotify/api'
+import env from 'react-dotenv';
 const authEndoints = {
     authenticate: () => {
-        const { client_id, client_secret } = settings
-
         const headers = new Headers();
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
         const body = new URLSearchParams();
         body.append('grant_type', 'client_credentials');
-        body.append('client_id', client_id);
-        body.append('client_secret', client_secret);
+        body.append('client_id', env.CLIENT_ID);
+        body.append('client_secret', env.CLIENT_SECRET);
 
 
         const result = fetch('https://accounts.spotify.com/api/token', {

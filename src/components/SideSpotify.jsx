@@ -100,7 +100,7 @@ function SideSpotify() {
                                 style={{
                                     padding: '0px',
                                     color: 'var(--spotify-grey)',
-                                    fontWeight: 'initial'
+                                    fontWeight: 'bold'
                                 }}>
                                 {`${song?.type.label} ${song.owner ? '•' : ''} ${song?.owner}`}
                             </ListItem>

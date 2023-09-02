@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected, setCheckPreview } from '../redux/reducers/spotifyReducer';
-
+import Testing from './Testing';
 export default function Player() {
     const dispatch = useDispatch()
     const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
@@ -162,11 +162,10 @@ export default function Player() {
                 <Repeat fontSize='small' style={{ color: 'var(--spotify-white)' }} />
             </div>
             <div className='pb2'>
-                {songTimeParser}
-                <span style={{ width: '500px', margin: '0px 10px' }}>
-                    <LinearProgress color="inherit" variant="determinate" value={songTimeProgress} style={{ color: 'var(--spotify-white)' }} />
+                <span style={{ width: '500px' }}>
+                    {/*<LinearProgress color="inherit" variant="determinate" value={songTimeProgress} style={{ color: 'var(--spotify-white)' }} />*/}
+                    <Testing currenntTime={songTimeParser} songTimeMax={formatTime(songTimeMax)} value={songTimeProgress} stepper={100 / songTimeMax} />
                 </span>
-                {formatTime(songTimeMax)}
             </div>
 
         </div>

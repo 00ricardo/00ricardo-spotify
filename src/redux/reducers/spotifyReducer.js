@@ -6,20 +6,20 @@ const initialState = {
       filtered: []
     },
     playlistSelected: {
-      "id": "1pGyuBcZrhHvJfUXLg2gmu",
-      "name": "Progressive Techno v7",
+      "id": "7pXeVKxejYk69erPcNpRrZ",
+      "name": "Spheres",
       "description": "",
       "owner": "Ricardo",
       "ownerid": "21zkb2ejrdp43tlqeirufqjrq",
       "tracksReference": {
-        "ref": "https://api.spotify.com/v1/playlists/1pGyuBcZrhHvJfUXLg2gmu/tracks",
-        "total": 7
+        "ref": "https://api.spotify.com/v1/playlists/7pXeVKxejYk69erPcNpRrZ/tracks",
+        "total": 5
       },
       "type": {
         "label": "Playlist",
         "value": "PLAYLIST"
       },
-      "src": "https://images-ak.spotifycdn.com/image/ab67706c0000bebbf209a817ae2e41704c3cf988"
+      "src": "https://images-ak.spotifycdn.com/image/ab67706c0000bebbfdaefa70d021302582cca486"
     },
     songSelected: {
       "#": null,

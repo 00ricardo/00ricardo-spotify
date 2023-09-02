@@ -9,6 +9,7 @@ import { setGradientColor, setSpotifyMusicList, setPlaylistSelected } from '../r
 import playlistEndpoints from '../services/endpoints/plyalists';
 import { useQuery } from '@tanstack/react-query';
 import ricardoImg from '../public/img/00ricardo.jpg'
+
 function SpotifyHeader() {
     const dispatch = useDispatch()
     const [gradientColor, setHeaderGradientColor] = useState("");
@@ -176,12 +177,13 @@ function SpotifyHeader() {
             <div style={{ paddingLeft: '25px' }}>
                 <p style={{ margin: 0 }}>{type.label}</p>
                 <h1 style={{
-                    fontSize: '65px',
+                    fontSize: '100px',
                     marginBottom: '10px',
                     marginTop: '10px',
-                    minWidth: '395px'
+                    minWidth: '395px',
+                    fontWeith: '1000'
                 }}>{name}</h1>
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                     <Avatar
                         style={{
                             height: '27px',

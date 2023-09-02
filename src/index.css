@@ -12,12 +12,12 @@
     --spotify-red: #d32f2f;
 }
 
-
-
-
 body {
     background-color: var(--spotify-black);
-    font-family: 'system-ui'
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+    font-size: smaller;
+    letter-spacing: 1px;
 }
 
 .background {
@@ -305,4 +305,29 @@ a {
 
 #audio-element-controller {
     display: none;
+}
+
+.css-wop1k0-MuiDataGrid-footerContainer {
+    display: none !important;
+}
+
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-withBorderColor {
+    border-color: transparent !important;
+}
+
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-iconSeparator {
+    color: transparent !important;
+}
+
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-columnHeader:focus,
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-cell:focus {
+    outline: transparent !important;
+}
+
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-row:hover {
+    background-color: #8584846e !important;
+}
+
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-columnHeader {
+    padding-right: 0 !important;
 }

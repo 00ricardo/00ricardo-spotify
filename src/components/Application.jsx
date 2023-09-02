@@ -8,11 +8,19 @@ import { TailSpin } from 'react-loader-spinner'
 import { Avatar, Alert, Snackbar } from '@mui/material';
 import spotifyLogo from '../public/img/spotify-logo.png'
 import { useDispatch, useSelector } from 'react-redux';
-import { setOpenSnackbar } from '../redux/reducers/spotifyReducer';
+import { setOpenSnackbar, setSongPlaying } from '../redux/reducers/spotifyReducer';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { useEffect } from 'react';
 function Application() {
 
   const dispatch = useDispatch()
   const { openSnackbar } = useSelector((state) => state.spotify)
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+  } = useSpeechRecognition();
+
 
   function wait(callback, milliseconds) {
     return new Promise((resolve, reject) => {
@@ -62,6 +70,17 @@ function Application() {
       </Alert>
     </Snackbar>
   )
+  const audio = document.getElementById('audio-element-controller')
+  /* useEffect(() => {
+ 
+     if (audio) {
+       if (!listening && !transcript.includes("deactivate")) SpeechRecognition.startListening()
+       if (transcript.includes("deactivate")) SpeechRecognition.stopListening()
+       if (transcript.includes("play song")) dispatch(setSongPlaying(true))
+       if (transcript.includes("stop song")) dispatch(setSongPlaying(false))
+     }
+ 
+   }, [listening, transcript, audio])*/
 
   if (isLoading) return (
     <div className='spotify-loading'>
@@ -93,12 +112,17 @@ function Application() {
     </div>
   )
 
+
+
   if (data) return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '97vh' }}>
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+
+
         <Sidebar />
         <Spotify />
       </div>
+
       <PlayBar />
       {openSnackbar && <SnackbarPreviewURLNull />}
     </div>
@@ -116,7 +140,7 @@ function Application() {
         variant='square'
         src={spotifyLogo}
       />
-      <Alert variant="filled" severity="error">
+      <Alert variant="filled" severity="error" style={{ marginTop: '30px' }}>
         Something went wrong. Try reloading the page!
       </Alert>
     </div>

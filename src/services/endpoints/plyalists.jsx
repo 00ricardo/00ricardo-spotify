@@ -1,8 +1,6 @@
-import settings from '../spotify/api'
-
+import env from 'react-dotenv';
 const playlistEndpoints = {
     getMyPlaylists: (authenticationSettings) => {
-        const { userid } = settings;
         const { access_token, token_type } = authenticationSettings
 
         // Headers with the Bearer token
@@ -15,7 +13,7 @@ const playlistEndpoints = {
         queryParams.append('offset', 0)
         queryParams.append('limit', 25)
 
-        const result = fetch(`https://api.spotify.com/v1/users/${userid}/playlists?${queryParams}`, {
+        const result = fetch(`https://api.spotify.com/v1/users/${env.USERID}/playlists?${queryParams}`, {
             method: 'GET',
             headers: headers
 
