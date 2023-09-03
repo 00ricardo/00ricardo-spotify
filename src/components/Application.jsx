@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 import Sidebar from './Sidebar';
 import PlayBar from './PlayBar';
@@ -10,16 +11,23 @@ import spotifyLogo from '../public/img/spotify-logo.png'
 import { useDispatch, useSelector } from 'react-redux';
 import { setOpenSnackbar, setSongPlaying } from '../redux/reducers/spotifyReducer';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 function Application() {
-
-  const dispatch = useDispatch()
   const { openSnackbar } = useSelector((state) => state.spotify)
+  const [currentTime, setCurrentTime] = useState({ action: 'ON_DEMAND', value: 0 });
+  const dispatch = useDispatch()
+  const audioRef = useRef(null)
+
   const {
     transcript,
     listening,
     resetTranscript,
   } = useSpeechRecognition();
+
+  const handleSliderChange = useCallback((newTime) => {
+    audioRef.current.currentTime = (newTime / 100) * audioRef.current.duration;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   function wait(callback, milliseconds) {
@@ -117,13 +125,10 @@ function Application() {
   if (data) return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '97vh' }}>
       <div style={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-
-
         <Sidebar />
-        <Spotify />
+        <Spotify audioRef={audioRef} />
       </div>
-
-      <PlayBar />
+      <PlayBar handleSliderChange={handleSliderChange} />
       {openSnackbar && <SnackbarPreviewURLNull />}
     </div>
   )

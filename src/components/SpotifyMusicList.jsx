@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected, setOpenSnackbar, setCheckPreview, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
 import { useQuery } from '@tanstack/react-query';
 import songEndpoints from '../services/endpoints/song';
-import DataGridDemo from './Music';
-function SpotifyMusicList() {
+import DataGridMusic from './DataGridMusic';
+function SpotifyMusicList({ audioRef }) {
     const dispatch = useDispatch()
     const { songSelected, spotifyMusicList, gradientColor, checkPreview } = useSelector((state) => state.spotify)
     const [data, setData] = useState(spotifyMusicList)
@@ -100,9 +100,11 @@ function SpotifyMusicList() {
     return (
         <div className='spotify-container' style={{ color: 'white', background: `linear-gradient(180deg, ${gradientColor[1]} 0%, rgba(18, 18, 18, 1) 10%)` }}>
             <SpotifyControllers />
-            <DataGridDemo />
+            <DataGridMusic />
             {previewURL &&
                 <audio
+                    ref={audioRef}
+                    controls
                     id='audio-element-controller'
                     onEnded={() => handleAudioEnded()}
                     autoPlay key={previewURL}>

@@ -34,7 +34,6 @@ function SideSpotify() {
         dispatch(setPlaylistsFiltered([...res]))
     }
 
-
     const handleSortedByFilter = (e) => {
         const value = e.target.value
         dispatch(setSortdBy(value))
@@ -66,7 +65,6 @@ function SideSpotify() {
     const handleSelectPlaylist = (playlist) => {
         dispatch(setPlaylistSelected(playlist))
     }
-
 
     const renderPlaylists = (song, index) => {
         return (
@@ -142,7 +140,6 @@ function SideSpotify() {
         })
         dispatch(setPlaylistsFiltered([...res]))
     }, [dispatch, playlists.base, searchInput])
-
 
     return (
         <div className='side-spotify container-1'>

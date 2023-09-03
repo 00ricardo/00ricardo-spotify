@@ -7,7 +7,7 @@ import CustomButtonWrapper from './CustomSpotifyLikeWrapper';
 import { setSongPlaying, setCheckPreview, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
-export default function DataGridDemo() {
+export default function DataGridMusic() {
     const { spotifyMusicList } = useSelector((state) => state.spotify)
     const [playingIconOnHover, setPlayingIconOnHover] = useState({})
     const [data, setData] = useState(spotifyMusicList)
@@ -149,6 +149,7 @@ export default function DataGridDemo() {
             sortable: false,
             width: 45,
             renderCell: createIdContent,
+            borderColor: 'red'
         },
         {
             field: 'title',
@@ -188,6 +189,26 @@ export default function DataGridDemo() {
         },
     ];
 
+    const cssRules = {
+        '& .MuiDataGrid-withBorderColor': {
+            borderColor: 'transparent'
+        },
+        '& .MuiDataGrid-row.Mui-selected, & .MuiDataGrid-row.Mui-selected:hover': {
+            backgroundColor: 'rgb(90 90 90)',
+            borderRadius: '4px'
+        },
+        '& .MuiDataGrid-row:hover': {
+            backgroundColor: 'rgb(42 42 42)',
+            borderRadius: '4px'
+        },
+        '& .MuiDataGrid-iconSeparator': {
+            display: 'none'
+        },
+        '& .MuiDataGrid-cell:focus, & .MuiDataGrid-columnHeader:focus-within, & .MuiDataGrid-cell:focus-within': {
+            outline: 'transparent'
+        }
+    }
+
     useEffect(() => {
         const _data = [...spotifyMusicList]
         const temp = _data.map((d) => {
@@ -197,24 +218,26 @@ export default function DataGridDemo() {
         })
         setData(temp)
     }, [spotifyMusicList])
+
+
     return (
         <Fragment>
-            {data.length > 0 ? (
-                <Box sx={{ height: '100%', width: '100%' }}>
-                    <DataGrid
-                        style={{ marginLeft: '40px', color: 'white', borderColor: 'transparent' }}
-                        rows={data}
-                        columns={columns}
-                        disableRowSelectionOnClick
-                        disableColumnMenu
-                        slotProps={{
-                            row: {
-                                onMouseEnter: handleHover,
-                                onMouseLeave: handleUnHover
-                            }
-                        }}
-                    />
-                </Box>) : <Box>Loading...</Box>}
+            <Box sx={{ height: '100%', width: '100%' }}>
+                <DataGrid
+                    sx={cssRules}
+                    style={{ marginLeft: '40px', color: 'white', borderColor: 'transparent' }}
+                    rows={data}
+                    columns={columns}
+                    //disableRowSelectionOnClick
+                    disableColumnMenu
+                    slotProps={{
+                        row: {
+                            onMouseEnter: handleHover,
+                            onMouseLeave: handleUnHover
+                        }
+                    }}
+                />
+            </Box>
         </Fragment>
     );
 }

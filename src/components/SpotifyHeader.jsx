@@ -114,14 +114,12 @@ function SpotifyHeader() {
         dispatch(setSpotifyMusicList(tracks))
     }
 
-
     useEffect(() => {
         if (colors) {
             dispatch(setGradientColor(colors))
             setHeaderGradientColor(colors)
         }
     }, [dispatch, colors])
-
 
     useQuery({
         queryKey: ['spotify-playlist', id],

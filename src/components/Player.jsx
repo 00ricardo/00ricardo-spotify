@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { LinearProgress } from '@mui/material';
 import {
     PlayCircle, SkipPrevious, SkipNext,
@@ -8,8 +8,8 @@ import {
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected, setCheckPreview } from '../redux/reducers/spotifyReducer';
-import Testing from './Testing';
-export default function Player() {
+import MusicSliderProgress from './MusicSliderProgress';
+export default function Player({ handleSliderChange }) {
     const dispatch = useDispatch()
     const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
     const songTimeMax = Math.floor(songSelected.time) // dummy example 03:23
@@ -32,7 +32,6 @@ export default function Player() {
         dispatch(setCheckPreview({ song: nextSong, check: true }))
     }
 
-
     const runSongTimer = () => {
         const stepper = 100 / songTimeMax;
         const timer = setInterval(() => {
@@ -51,16 +50,23 @@ export default function Player() {
                 // Update song time and progress
                 const _oldTimer = oldTimer + (songTimeMax - 29) === songTimeMax - 29 ? songTimeMax - 29 : oldTimer + (songTimeMax - 29)
 
-                setSongTimeParser(formatTime(_oldTimer + 1));
+                setSongTimeParser((oldTimeParser) => {
+                    if (oldTimeParser === formatTime(songTimeMax)) {
+                        jumpToNextSong()
+                        return formatTime(0);
+                    }
+                    return formatTime(_oldTimer + 1)
+                });
 
                 setSongTimeProgress((oldProgress) => {
-
                     //Jump to next Song
-                    if (oldProgress >= 100) {
+                    if (oldProgress >= 100 || songTimeParser === formatTime(songTimeMax)) {
                         jumpToNextSong()
                         return 0
                     } else {
+
                         const _oldTimer = oldProgress + stepper === stepper ? ((songTimeMax - 29) * 100) / songTimeMax : oldProgress
+                        //console.log(_oldTimer + stepper)
                         return _oldTimer + stepper
                     }
 
@@ -72,7 +78,7 @@ export default function Player() {
         setTimerRef(timer);
     };
     // Format time in MM:SS format
-    const formatTime = (seconds) => {
+    const formatTime = useCallback((seconds) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
 
@@ -80,7 +86,7 @@ export default function Player() {
         const formattedSeconds = String(remainingSeconds).padStart(2, '0');
 
         return `${formattedMinutes}:${formattedSeconds}`;
-    };
+    }, []);
 
     // Function to play or pause the song
     const playOrPause = () => {
@@ -164,7 +170,16 @@ export default function Player() {
             <div className='pb2'>
                 <span style={{ width: '500px' }}>
                     {/*<LinearProgress color="inherit" variant="determinate" value={songTimeProgress} style={{ color: 'var(--spotify-white)' }} />*/}
-                    <Testing currenntTime={songTimeParser} songTimeMax={formatTime(songTimeMax)} value={songTimeProgress} stepper={100 / songTimeMax} />
+                    <MusicSliderProgress
+                        songTimeParser={songTimeParser}
+                        songTimeMax={songTimeMax}
+                        value={songTimeProgress}
+                        stepper={100 / songTimeMax}
+                        handleSliderChange={handleSliderChange}
+                        setSongTimeProgress={setSongTimeProgress}
+                        formatTime={formatTime}
+                        setSongTime={setSongTime}
+                    />
                 </span>
             </div>
 
