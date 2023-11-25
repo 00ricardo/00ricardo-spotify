@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Slider from '@mui/material/Slider';
-
+import { batch } from '@preact/signals-react';
+import { songTimeProgress, songTime, songTimeParser } from '../signals';
 const Widget = styled('div')(() => ({
     padding: 16,
     borderRadius: 16,
@@ -48,44 +49,34 @@ const cssRules = {
 }
 
 
-export default function MusicSliderProgress({ songTimeParser, songTimeMax, value,
-    stepper, handleSliderChange, setSongTimeProgress,
-    formatTime, setSongTime }) {
-    //const [sliderValue, setSliderValue] = useState(value)
+export default function MusicSliderProgress({ songTimeMax, stepper, handleSliderChange, formatTime }) {
     const handleMouseUp = (e, val) => {
-        console.log(val)
         const minValue = 100 * 29 / songTimeMax
-        console.log(minValue)
         if (val >= minValue) {
             handleSliderChange(val)
-            setSongTimeProgress(val)
-            //setSliderValue(val)
-            const newSontTime = 29 * value / 100
-            setSongTime(parseInt(newSontTime))
+            songTimeProgress.value = val
+            const newSontTime = 29 * songTimeProgress.value / 100
+            songTime.value = parseInt(newSontTime)
         } else {
             handleSliderChange(0)
-            setSongTimeProgress(0)
-            setSongTime(0)
-            // setSliderValue(0)
+            batch(() => {
+                songTimeProgress.value = 0
+                songTime.value = 0
+            })
         }
-
     }
 
     const handleOnChange = (e) => {
         const newTime = e.target.value;
-        setSongTimeProgress(newTime)
+        songTimeProgress.value = newTime
     }
-
-    useEffect(() => {
-
-    }, [])
 
     return (
         <Widget style={{ display: 'flex', padding: 0, width: '100%', alignItems: 'center' }}>
             <TinyText style={{ paddingRight: '10px' }}>{songTimeParser}</TinyText>
             <Slider
                 size="small"
-                value={value}
+                value={songTimeProgress.value}
                 min={0}
                 step={stepper}
                 max={100}

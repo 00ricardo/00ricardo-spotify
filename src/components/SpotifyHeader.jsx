@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useEffect, Fragment } from 'react'
 import {
     Avatar
 } from '@mui/material';
@@ -9,12 +9,10 @@ import { setGradientColor, setSpotifyMusicList, setPlaylistSelected } from '../r
 import playlistEndpoints from '../services/endpoints/plyalists';
 import { useQuery } from '@tanstack/react-query';
 import ricardoImg from '../public/img/00ricardo.jpg'
-
+import { gradientColor } from '../signals';
 function SpotifyHeader() {
     const dispatch = useDispatch()
-    const [gradientColor, setHeaderGradientColor] = useState("");
     const { playlistSelected } = useSelector((state) => state.spotify)
-
     const { id, name, owner, tracksReference, type, src, totalPlaylistDuration } = playlistSelected
     const authenticationSettings = JSON.parse(localStorage.getItem('authentication'))
     const { colors } = useImageColor(src, { cors: true, colors: 2 })
@@ -117,7 +115,7 @@ function SpotifyHeader() {
     useEffect(() => {
         if (colors) {
             dispatch(setGradientColor(colors))
-            setHeaderGradientColor(colors)
+            gradientColor.value = colors
         }
     }, [dispatch, colors])
 
@@ -162,7 +160,7 @@ function SpotifyHeader() {
     return (
         <div id={id}
             className='header'
-            style={{ background: `linear-gradient(180deg, ${gradientColor[2]} 0%, ${gradientColor[1]} 100%, ${gradientColor[0]} 100%)` }}
+            style={{ background: `linear-gradient(180deg, ${gradientColor.value[2]} 0%, ${gradientColor.value[1]} 100%, ${gradientColor.value[0]} 100%)` }}
         >
             <Avatar
                 style={{

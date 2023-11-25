@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { Fragment, useEffect, useRef } from 'react'
 import { Layers, Add, ArrowForward, Search } from '@mui/icons-material';
 import {
     Chip, ListItem, ListItemButton,
@@ -10,12 +10,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFilterSelected, setSortdBy, setPlaylistsFiltered, setPlaylistSelected } from '../redux/reducers/spotifyReducer';
+import { activateShadow, showSearchInput, searchInput } from '../signals';
 function SideSpotify() {
     const dispatch = useDispatch()
     const { filterSelected, playlists } = useSelector(state => state.spotify)
-    const [activateShadow, setActivateShadow] = useState(false)
-    const [showSearchInput, setShowSearchInput] = useState(false)
-    const [searchInput, setSearchInput] = useState('')
+
     const filters = [
         { label: 'Recents', value: 'RECENTS' },
         { label: 'Recently added', value: 'RECENTLY_ADDED' },
@@ -25,7 +24,8 @@ function SideSpotify() {
 
     const handleShadowBox = (e) => {
         const tlRef = trackListRef.current;
-        setActivateShadow(tlRef.scrollTop !== 0)
+        //setActivateShadow(tlRef.scrollTop !== 0)
+        activateShadow.value = tlRef.scrollTop !== 0
     }
 
     const handleFiltering = (filter) => {
@@ -135,11 +135,12 @@ function SideSpotify() {
         const _playlists = res.length > 0 ? [...res] : [...playlists.base]
         res = _playlists.filter(pl => {
             const songName = pl.name.toUpperCase()
-            const _searchInput = searchInput.toUpperCase()
+            const _searchInput = (searchInput.value).toUpperCase()
             return songName.includes(_searchInput)
         })
         dispatch(setPlaylistsFiltered([...res]))
-    }, [dispatch, playlists.base, searchInput])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, playlists.base, searchInput.value])
 
     return (
         <div className='side-spotify container-1'>
@@ -194,9 +195,9 @@ function SideSpotify() {
                         {showSearchInput ?
                             <TextField
                                 value={searchInput}
-                                onChange={(e) => setSearchInput(e.target.value)}
+                                onChange={(e) => searchInput.value = e.target.value}
                                 className='search-input'
-                                onBlur={() => setShowSearchInput(false)}
+                                onBlur={() => showSearchInput.value = false}
                                 size="small"
                                 style={{
                                     color: 'red',
@@ -220,7 +221,7 @@ function SideSpotify() {
                             /> :
                             <Tooltip title="Search in Your Library">
                                 <IconButton
-                                    onClick={() => setShowSearchInput(true)}
+                                    onClick={() => showSearchInput.value = true}
                                     size="medium"
                                     style={{ color: 'var(--spotify-grey)' }}
                                 >

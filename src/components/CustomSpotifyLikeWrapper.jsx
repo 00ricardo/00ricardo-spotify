@@ -1,18 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 import SpotifyLike from '../public/lotties/spotify-like.json';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSongSelected, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
-
+import { useSignal } from "@preact/signals-react";
+import { g_songSelected, g_spotifyMusicList } from './../signals/index';
 function CustomButtonWrapper({ track_id }) {
-    const { songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
     const lottieRef = useRef(null);
-    const dispatch = useDispatch()
-    const [end, setEnd] = useState(false);
+    const end = useSignal(false)
 
     const startLikeAnimation = () => {
-        setEnd(false)
-        const song = spotifyMusicList.find((s, i) => s.track_id === track_id)
+        end.value = false
+        const song = g_spotifyMusicList.value.find((s, i) => s.track_id === track_id)
         if (lottieRef.current) {
             if (!end) {
                 lottieRef.current.setSeeker(0);
@@ -20,17 +17,16 @@ function CustomButtonWrapper({ track_id }) {
             } else {
                 lottieRef.current.setSeeker(0);
             }
-            const _songSelected = { ...songSelected }
-            if (track_id === _songSelected.track_id) {
-                dispatch(setSongSelected({ ..._songSelected, saved: !_songSelected.saved }))
+            if (track_id === g_songSelected.value.track_id) {
+                g_songSelected.value = { ...g_songSelected.value, saved: !g_songSelected.value.saved }
             }
-            const tempArray = [...spotifyMusicList]
+            const tempArray = [...g_spotifyMusicList.value]
             const songIdx = tempArray.findIndex((s, i) => s.track_id === track_id)
 
             if (songIdx !== -1) {
                 tempArray[songIdx] = { ...tempArray[songIdx], saved: !song.saved };
             }
-            dispatch(setSpotifyMusicList([...tempArray]))
+            g_spotifyMusicList.value = [...tempArray]
         }
     };
 
@@ -39,14 +35,14 @@ function CustomButtonWrapper({ track_id }) {
     }, [end]);
 
     const handleEventPlayer = (e) => {
-        const song = spotifyMusicList.find((s, i) => s.track_id === track_id)
+        const song = (g_spotifyMusicList.value).find((s, i) => s.track_id === track_id)
 
         //Check if the song is saved
         // If it is, then lottie should be animated (seeker 55)
         if (song && song.saved && e === 'load') lottieRef.current.setSeeker(55);
 
         // Normal animation
-        if (lottieRef.current && e === 'play') setEnd(true);
+        if (lottieRef.current && e === 'play') end.value = true;
     };
 
     return (

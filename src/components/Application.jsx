@@ -8,21 +8,10 @@ import authEndpoints from '../services/endpoints/auth'
 import { TailSpin } from 'react-loader-spinner'
 import { Avatar, Alert, Snackbar } from '@mui/material';
 import spotifyLogo from '../public/img/spotify-logo.png'
-import { useDispatch, useSelector } from 'react-redux';
-import { setOpenSnackbar, setSongPlaying } from '../redux/reducers/spotifyReducer';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
+import { g_openSnackbar } from '../signals';
 function Application() {
-  const { openSnackbar } = useSelector((state) => state.spotify)
-  const [currentTime, setCurrentTime] = useState({ action: 'ON_DEMAND', value: 0 });
-  const dispatch = useDispatch()
   const audioRef = useRef(null)
-
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-  } = useSpeechRecognition();
 
   const handleSliderChange = useCallback((newTime) => {
     audioRef.current.currentTime = (newTime / 100) * audioRef.current.duration;
@@ -62,12 +51,13 @@ function Application() {
     if (reason === 'clickaway') {
       return;
     }
-    dispatch(setOpenSnackbar(false));
+    //dispatch(setOpenSnackbar(false));
+    g_openSnackbar.value = false
   };
 
   const SnackbarPreviewURLNull = () => (
     <Snackbar
-      open={openSnackbar}
+      open={g_openSnackbar.value}
       autoHideDuration={10000}
       onClose={handleCloseSnackbar}>
       <Alert
@@ -129,7 +119,7 @@ function Application() {
         <Spotify audioRef={audioRef} />
       </div>
       <PlayBar handleSliderChange={handleSliderChange} />
-      {openSnackbar && <SnackbarPreviewURLNull />}
+      {g_openSnackbar.value && <SnackbarPreviewURLNull />}
     </div>
   )
 

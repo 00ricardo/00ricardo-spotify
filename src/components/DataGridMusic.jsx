@@ -1,24 +1,20 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Box, Avatar } from '@mui/material'
 import { Audio } from 'react-loader-spinner'
 import CustomButtonWrapper from './CustomSpotifyLikeWrapper';
-import { setSongPlaying, setCheckPreview, setSpotifyMusicList } from '../redux/reducers/spotifyReducer';
-import { useDispatch, useSelector } from 'react-redux';
+import { playingIconOnHover, g_spotifyMusicList, g_checkPreview, g_songPlaying } from '../signals';
+import { batch } from '@preact/signals-react';
 
 export default function DataGridMusic() {
-    const { spotifyMusicList } = useSelector((state) => state.spotify)
-    const [playingIconOnHover, setPlayingIconOnHover] = useState({})
-    const [data, setData] = useState(spotifyMusicList)
-    const dispatch = useDispatch()
 
     const createDurationContent = (row) => {
         const temp = { ...row?.row }
         const { formatedTime, track_id, saved } = temp
         return (
             <Fragment>
-                {playingIconOnHover[track_id] || saved ? <CustomButtonWrapper track_id={track_id} /> : <></>}
+                {playingIconOnHover.value[track_id] || saved ? <CustomButtonWrapper track_id={track_id} /> : <></>}
                 {formatedTime}
             </Fragment>
         )
@@ -84,35 +80,29 @@ export default function DataGridMusic() {
 
         return (
             <Box style={{ cursor: 'pointer' }}>
-                {!isPlaying && !playingIconOnHover[track_id] ? id
-                    : !isPlaying && playingIconOnHover[track_id] ? <PlayArrow onClick={() => handlePlaySong(songObj)} />
-                        : isPlaying && !playingIconOnHover[track_id] ? <Audio height='20' width='20' color='var(--spotify-green)' ariaLabel='audio-loading' wrapperClass='wrapper-class' visible={true} />
+                {!isPlaying && !playingIconOnHover.value[track_id] ? id
+                    : !isPlaying && playingIconOnHover.value[track_id] ? <PlayArrow onClick={() => handlePlaySong(songObj)} />
+                        : isPlaying && !playingIconOnHover.value[track_id] ? <Audio height='20' width='20' color='var(--spotify-green)' ariaLabel='audio-loading' wrapperClass='wrapper-class' visible={true} />
                             : <Pause onClick={() => handlePauseSong()} />}
             </Box>
         )
     }
     const handleHover = (event) => {
         const track_id = event.currentTarget.dataset.id
-        const row = data.find((r) => r.id === parseFloat(track_id));
-        if (!playingIconOnHover[track_id]) {
-            setPlayingIconOnHover(prevState => ({
-                ...prevState,
-                [row.track_id]: true
-            }));
+        const row = (g_spotifyMusicList.value).find((r) => r.id === parseFloat(track_id));
+        if (row && !playingIconOnHover.value[track_id]) {
+            playingIconOnHover.value = { ...playingIconOnHover.value, [row.track_id]: true }
         }
     };
 
     const handleUnHover = (event) => {
         const track_id = event.currentTarget.dataset.id
-        const row = data.find((r) => r.id === parseFloat(track_id));
-        setPlayingIconOnHover(prevState => ({
-            ...prevState,
-            [row.track_id]: false
-        }));
+        const row = (g_spotifyMusicList.value).find((r) => r.id === parseFloat(track_id));
+        playingIconOnHover.value = { ...playingIconOnHover.value, [row.track_id]: false }
     };
 
     const handlePlaySong = (songObj) => {
-        const _data = [...data]
+        const _data = [...g_spotifyMusicList.value]
         const newData = _data.map((dt) => {
             const d = { ...dt }
             if (d.isPlaying && songObj.track_id !== d.track_id) d.isPlaying = false
@@ -120,23 +110,29 @@ export default function DataGridMusic() {
             return d
         })
         const updateSongSelected = { ...songObj }
-        dispatch(setCheckPreview({ song: updateSongSelected, check: true }))
-        dispatch(setSpotifyMusicList(newData))
-        setData([...newData])
+        batch(() => {
+            g_checkPreview.value = { song: updateSongSelected, check: true }
+            g_spotifyMusicList.value = newData
+        })
+
+        g_spotifyMusicList.value = [...newData]
+
         const audio = document.getElementById('audio-element-controller')
         if (audio) audio.play()
     }
 
     const handlePauseSong = () => {
-        const _data = [...data]
+        const _data = [...g_spotifyMusicList.value]
         const newData = _data.map((dt, i) => {
             const d = { ...dt }
             d.isPlaying = false
             return d
         })
-        setData([...newData])
-        dispatch(setSongPlaying(false))
-        dispatch(setSpotifyMusicList(newData))
+        g_spotifyMusicList.value = [...newData]
+        batch(() => {
+            g_songPlaying.value = false
+            g_spotifyMusicList.value = newData
+        })
         const audio = document.getElementById('audio-element-controller')
         if (audio) audio.pause()
     }
@@ -209,24 +205,14 @@ export default function DataGridMusic() {
         }
     }
 
-    useEffect(() => {
-        const _data = [...spotifyMusicList]
-        const temp = _data.map((d) => {
-            const obj = { ...d }
-            obj.id = d['#']
-            return obj
-        })
-        setData(temp)
-    }, [spotifyMusicList])
-
-
     return (
         <Fragment>
             <Box sx={{ height: '100%', width: '100%' }}>
                 <DataGrid
+                    getRowId={(row) => row['#']}
                     sx={cssRules}
                     style={{ marginLeft: '40px', color: 'white', borderColor: 'transparent' }}
-                    rows={data}
+                    rows={g_spotifyMusicList.value}
                     columns={columns}
                     //disableRowSelectionOnClick
                     disableColumnMenu

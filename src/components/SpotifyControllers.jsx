@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import {
     PlayCircle,
     DownloadForOfflineOutlined,
@@ -12,18 +12,17 @@ import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 import SpotifyLike from '../public/lotties/spotify-like.json'
 import { useDispatch, useSelector } from 'react-redux';
 import { setSongPlaying, setSongSelected } from '../redux/reducers/spotifyReducer';
-
+import { controllerEnd, anchorEl } from '../signals';
+import { effect } from '@preact/signals-react';
 function SpotifyControllers() {
     const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
-    const [end, setEnd] = useState(false)
-    const [anchorEl, setAnchorEl] = useState(null);
     const lottieRef = useRef(null);
     const dispatch = useDispatch()
 
     const startLikeAnimation = () => {
-        setEnd(false)
+        controllerEnd.value = false
         if (lottieRef.current) {
-            if (!end) {
+            if (!controllerEnd.value) {
                 lottieRef.current.setSeeker(0);
                 lottieRef.current.play();
             } else {
@@ -33,16 +32,16 @@ function SpotifyControllers() {
     };
     const handleEventPlayer = (e) => {
         if (lottieRef.current && e === 'complete') {
-            setEnd(true)
+            controllerEnd.value = true
         }
     };
 
     const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
+        anchorEl.value = event.currentTarget;
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+        anchorEl.value = null;
     };
 
     const handlePlaySong = () => {
@@ -75,13 +74,12 @@ function SpotifyControllers() {
         if (!songPlaying) handlePlaySong()
     }
 
-    const open = Boolean(anchorEl);
+    const open = Boolean(anchorEl.value);
     const id = open ? 'simple-popover' : undefined;
 
-    useEffect(() => {
-        if (end) lottieRef.current.setSeeker(55);
-    }, [end])
-
+    effect(() => {
+        if (controllerEnd.value) lottieRef.current.setSeeker(55);
+    })
 
     return (
         <div className='spotify-main-controlers'>
@@ -129,7 +127,7 @@ function SpotifyControllers() {
             <Popover
                 id={id}
                 open={open}
-                anchorEl={anchorEl}
+                anchorEl={anchorEl.value}
                 onClose={handleClose}
                 anchorOrigin={{
                     vertical: 'top',

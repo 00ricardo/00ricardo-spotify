@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import SpotifyControllers from './SpotifyControllers';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,12 +6,11 @@ import { setSongPlaying, setSongSelected, setOpenSnackbar, setCheckPreview, setS
 import { useQuery } from '@tanstack/react-query';
 import songEndpoints from '../services/endpoints/song';
 import DataGridMusic from './DataGridMusic';
+import { g_spotifyMusicList, previewURL } from '../signals';
 function SpotifyMusicList({ audioRef }) {
     const dispatch = useDispatch()
     const { songSelected, spotifyMusicList, gradientColor, checkPreview } = useSelector((state) => state.spotify)
-    const [data, setData] = useState(spotifyMusicList)
     const authenticationSettings = JSON.parse(localStorage.getItem('authentication'))
-    const [previewURL, setPreviewURL] = useState(null)
 
     function isObjectEmpty(obj) {
         for (const key in obj) {
@@ -42,8 +41,7 @@ function SpotifyMusicList({ audioRef }) {
     }
 
     const handlePauseSong = () => {
-        const _data = [...data]
-        const newData = _data.map((dt, i) => {
+        const newData = g_spotifyMusicList.value.map((dt, i) => {
             const d = { ...dt }
             d.isPlaying = false
             return d
@@ -58,7 +56,7 @@ function SpotifyMusicList({ audioRef }) {
         onSuccess: (data) => {
             const { preview_url } = data
             if (preview_url) {
-                setPreviewURL(preview_url)
+                previewURL.value = preview_url
                 const updateSongSelected = { ...checkPreview.song }
                 if (!isObjectEmpty(updateSongSelected)) {
                     handlePauseSong()
@@ -90,7 +88,8 @@ function SpotifyMusicList({ audioRef }) {
             return obj
 
         })
-        setData(temp)
+        console.log(temp)
+        g_spotifyMusicList.value = temp
     }, [spotifyMusicList])
 
     const handleAudioEnded = () => {
@@ -101,14 +100,14 @@ function SpotifyMusicList({ audioRef }) {
         <div className='spotify-container' style={{ color: 'white', background: `linear-gradient(180deg, ${gradientColor[1]} 0%, rgba(18, 18, 18, 1) 10%)` }}>
             <SpotifyControllers />
             <DataGridMusic />
-            {previewURL &&
+            {previewURL.value &&
                 <audio
                     ref={audioRef}
                     controls
                     id='audio-element-controller'
                     onEnded={() => handleAudioEnded()}
-                    autoPlay key={previewURL}>
-                    <source src={previewURL} type="audio/ogg" />
+                    autoPlay key={previewURL.value}>
+                    <source src={previewURL.value} type="audio/ogg" />
                 </audio>}
         </div>
     )

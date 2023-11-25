@@ -1,17 +1,18 @@
-import React, { useEffect, useState, useRef, Fragment } from 'react'
+import React, { useEffect, useRef, Fragment } from 'react'
 import { Avatar, } from '@mui/material';
 import { PictureInPictureAlt } from '@mui/icons-material';
 import SpotifyLike from '../public/lotties/spotify-like.json'
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSongSelected } from '../redux/reducers/spotifyReducer';
+import { end } from '../signals';
 function PlayerTrack() {
     const { songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
-    const [end, setEnd] = useState(false)
+
     const dispatch = useDispatch()
     const lottieRef = useRef(null);
     const startLikeAnimation = () => {
-        setEnd(false)
+        end.value = false
         if (lottieRef.current) {
             if (!end) {
                 lottieRef.current.setSeeker(0);
@@ -32,7 +33,7 @@ function PlayerTrack() {
         //Check if the song is saved
         // If it is, then lottie should be animated (seeker 55)
         if (songSelected && songSelected.saved && e === 'load') lottieRef.current.setSeeker(55);
-        if (lottieRef.current && e === 'play') setEnd(true)
+        if (lottieRef.current && e === 'play') end.value = true
     };
 
     const transformArtistsData = (artists) => {

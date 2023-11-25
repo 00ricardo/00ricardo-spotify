@@ -1,35 +1,30 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { LinearProgress } from '@mui/material';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
     PlayCircle, SkipPrevious, SkipNext,
     Shuffle, Repeat, Pause
 } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSongPlaying, setSongSelected, setCheckPreview } from '../redux/reducers/spotifyReducer';
 import MusicSliderProgress from './MusicSliderProgress';
+import {
+    songTimeProgress, songTime, songTimeParser, timerRef,
+    g_songPlaying, g_songSelected, g_spotifyMusicList, g_checkPreview
+} from '../signals';
+import { batch } from '@preact/signals-react';
+
 export default function Player({ handleSliderChange }) {
-    const dispatch = useDispatch()
-    const { songPlaying, songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
-    const songTimeMax = Math.floor(songSelected.time) // dummy example 03:23
-    const [songTimeProgress, setSongTimeProgress] = useState(0);
-    const [songTime, setSongTime] = useState(0);
-    const [songTimeParser, setSongTimeParser] = useState('00:00');
-    const [timerRef, setTimerRef] = useState(null);
-    const [_songSelected, _setSongSelected] = useState(songSelected)
+    const songTimeMax = Math.floor(g_songSelected.value.time) // dummy example 03:23
     const prevSongSelected = useRef(null); // Store the previous songSelected value
 
-
     const jumpToNextSong = () => {
-        const currentSong = { ...songSelected }
-        const availableSongs = [...spotifyMusicList]
-        let nextSong = availableSongs.find((song) => song['#'] === currentSong['#'] + 1)
+        const currentSong = { ...g_songSelected.value }
+        let nextSong = g_spotifyMusicList.value.find((song) => song['#'] === currentSong['#'] + 1)
         if (!nextSong) {
-            nextSong = availableSongs.find((song) => song['#'] === 1)
-            dispatch(setSongPlaying(false))
+            nextSong = g_spotifyMusicList.value.find((song) => song['#'] === 1)
+            g_songPlaying.value = false
         }
-        dispatch(setCheckPreview({ song: nextSong, check: true }))
+        g_checkPreview.value = { song: nextSong, check: true }
+
     }
 
     const runSongTimer = () => {
@@ -37,45 +32,47 @@ export default function Player({ handleSliderChange }) {
         const timer = setInterval(() => {
 
             // When song ends
-            setSongTime((oldTimer) => {
-                if (oldTimer === songTimeMax) {
+            songTime.value = (() => {
+                if (songTime.value === songTimeMax) {
                     clearInterval(timer);
-                    setTimerRef(null);
-                    setSongTimeParser('00:00');
-                    setSongTimeProgress(0); // Reset progress
+                    batch(() => {
+                        timerRef.value = null;
+                        songTimeParser.value = '00:00';
+                        songTimeProgress.value = 0; // Reset progress
+                    })
                     jumpToNextSong()
                     return 0;
                 }
 
                 // Update song time and progress
-                const _oldTimer = oldTimer + (songTimeMax - 29) === songTimeMax - 29 ? songTimeMax - 29 : oldTimer + (songTimeMax - 29)
+                const _oldTimer = songTime.value + (songTimeMax - 29) === songTimeMax - 29 ? songTimeMax - 29 : songTime.value + (songTimeMax - 29)
 
-                setSongTimeParser((oldTimeParser) => {
-                    if (oldTimeParser === formatTime(songTimeMax)) {
+                songTimeParser.value = (() => {
+                    if (songTimeParser.value === formatTime(songTimeMax)) {
                         jumpToNextSong()
                         return formatTime(0);
                     }
                     return formatTime(_oldTimer + 1)
                 });
 
-                setSongTimeProgress((oldProgress) => {
+                songTimeProgress.value = (() => {
                     //Jump to next Song
-                    if (oldProgress >= 100 || songTimeParser === formatTime(songTimeMax)) {
+                    if (songTimeProgress.value >= 100 || songTimeParser === formatTime(songTimeMax)) {
                         jumpToNextSong()
                         return 0
                     } else {
 
-                        const _oldTimer = oldProgress + stepper === stepper ? ((songTimeMax - 29) * 100) / songTimeMax : oldProgress
+                        const _oldTimer = songTimeProgress.value + stepper === stepper ? ((songTimeMax - 29) * 100) / songTimeMax : songTimeProgress.value
                         //console.log(_oldTimer + stepper)
                         return _oldTimer + stepper
                     }
 
                 });
 
-                return oldTimer + 1;
+                return songTime.value + 1;
             });
         }, 1000);
-        setTimerRef(timer);
+        timerRef.value = timer;
     };
     // Format time in MM:SS format
     const formatTime = useCallback((seconds) => {
@@ -90,10 +87,10 @@ export default function Player({ handleSliderChange }) {
 
     // Function to play or pause the song
     const playOrPause = () => {
-        const _data = [...spotifyMusicList]
+        const _data = [...g_spotifyMusicList.value]
         const audio = document.getElementById('audio-element-controller')
         let newData = null
-        if (songSelected.isPlaying) {
+        if (g_songSelected.value.isPlaying) {
             newData = _data.map((d, i) => {
                 const obj = { ...d, isPlaying: false }
                 return obj
@@ -101,44 +98,45 @@ export default function Player({ handleSliderChange }) {
             if (audio) audio.pause()
 
         } else {
-            const songIdx = songSelected['#']
+            const songIdx = g_songSelected.value['#']
             const _songIdx = _data.findIndex((d, i) => d['#'] === songIdx)
             if (_songIdx !== -1) {
-                _data[_songIdx] = { ...songSelected, isPlaying: true }
+                _data[_songIdx] = { ...g_songSelected.value, isPlaying: true }
             }
             newData = [..._data]
             if (audio) audio.play()
         }
-
-        dispatch(setSongPlaying(!songSelected.isPlaying)); // Play the song
+        g_songPlaying.value = !g_songSelected.value.isPlaying  // Play the song
     };
 
     useEffect(() => {
         // useSelector takes priority
         const prevSong = prevSongSelected.current ? prevSongSelected.current['#'] : null;
-        const newSong = songSelected ? songSelected['#'] : null;
+        const newSong = g_songSelected.value ? g_songSelected.value['#'] : null;
         // only reset if we selected a different song to play
         if (prevSong !== newSong) {
-            if (songPlaying) {
+            if (g_songPlaying.value) {
                 // Reset timer progress
                 clearInterval(timerRef);
-                setTimerRef(null);
-                setSongTimeParser('00:00');
-                setSongTime(0)
-                setSongTimeProgress(0);
+                batch(() => {
+                    timerRef.value = null;
+                    songTimeParser.value = '00:00';
+                    songTime.value = 0;
+                    songTimeProgress.value = 0;
+                })
                 runSongTimer();
             }
         } else {
-            if (songPlaying
-                && songSelected.isPlaying
+            if (g_songPlaying.value
+                && g_songSelected.value.isPlaying
                 && songTimeProgress === 0) runSongTimer();
         }
 
-    }, [songPlaying, songSelected]);
+    }, [g_songPlaying.value, g_songSelected.value]);
 
 
     useEffect(() => {
-        if (!songSelected.isPlaying && timerRef) {
+        if (!g_songSelected.value.isPlaying && timerRef) {
             // Resume... continue progress timer
             clearInterval(timerRef);
         } else {
@@ -146,12 +144,12 @@ export default function Player({ handleSliderChange }) {
                 runSongTimer();
             }
         }
-    }, [songSelected.isPlaying]);
+    }, [g_songSelected.value.isPlaying]);
 
     useEffect(() => {
         // Store the current songSelected value in the ref
-        prevSongSelected.current = songSelected;
-    }, [songSelected]);
+        prevSongSelected.current = g_songSelected.value;
+    }, [g_songSelected.value]);
 
     return (
         <div>
@@ -160,7 +158,7 @@ export default function Player({ handleSliderChange }) {
                 <SkipPrevious fontSize='medium' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />
 
                 <div onClick={() => playOrPause()}>
-                    {!songSelected.isPlaying ?
+                    {!g_songSelected.value.isPlaying ?
                         <PlayCircle fontSize='large' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} /> :
                         <Pause fontSize='large' style={{ color: 'var(--spotify-white)', paddingRight: '15px' }} />}
                 </div>
@@ -169,16 +167,11 @@ export default function Player({ handleSliderChange }) {
             </div>
             <div className='pb2'>
                 <span style={{ width: '500px' }}>
-                    {/*<LinearProgress color="inherit" variant="determinate" value={songTimeProgress} style={{ color: 'var(--spotify-white)' }} />*/}
                     <MusicSliderProgress
-                        songTimeParser={songTimeParser}
                         songTimeMax={songTimeMax}
-                        value={songTimeProgress}
                         stepper={100 / songTimeMax}
                         handleSliderChange={handleSliderChange}
-                        setSongTimeProgress={setSongTimeProgress}
                         formatTime={formatTime}
-                        setSongTime={setSongTime}
                     />
                 </span>
             </div>
