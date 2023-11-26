@@ -68,17 +68,6 @@ function Application() {
       </Alert>
     </Snackbar>
   )
-  const audio = document.getElementById('audio-element-controller')
-  /* useEffect(() => {
- 
-     if (audio) {
-       if (!listening && !transcript.includes("deactivate")) SpeechRecognition.startListening()
-       if (transcript.includes("deactivate")) SpeechRecognition.stopListening()
-       if (transcript.includes("play song")) dispatch(setSongPlaying(true))
-       if (transcript.includes("stop song")) dispatch(setSongPlaying(false))
-     }
- 
-   }, [listening, transcript, audio])*/
 
   if (isLoading) return (
     <div className='spotify-loading'>

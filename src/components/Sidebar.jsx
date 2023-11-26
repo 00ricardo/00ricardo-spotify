@@ -3,11 +3,8 @@ import SideNavigation from './SideNavigation'
 import SideSpotify from './SideSpotify'
 import { useQuery } from '@tanstack/react-query';
 import playlistEndpoints from '../services/endpoints/plyalists'
-import { useDispatch } from 'react-redux';
-import { setPlaylistsBase, setPlaylistsFiltered } from '../redux/reducers/spotifyReducer';
-
+import { g_playlists } from '../signals';
 function Sidebar() {
-    const dispatch = useDispatch()
     const authenticationSettings = JSON.parse(localStorage.getItem('authentication'))
 
     const capitalizeFirstLetter = (str) => {
@@ -34,8 +31,8 @@ function Sidebar() {
             }
             return playlist
         });
-        dispatch(setPlaylistsBase(ready))
-        dispatch(setPlaylistsFiltered(ready))
+        g_playlists.value = { base: ready, filtered: ready }
+        localStorage.setItem('playlists', JSON.stringify(ready))
     }
 
     useQuery({

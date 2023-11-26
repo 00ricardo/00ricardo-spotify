@@ -8,12 +8,12 @@ import {
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFilterSelected, setSortdBy, setPlaylistsFiltered, setPlaylistSelected } from '../redux/reducers/spotifyReducer';
-import { activateShadow, showSearchInput, searchInput } from '../signals';
+import {
+    activateShadow, showSearchInput, searchInput,
+    g_filterSelected, g_playlists, g_playlistSelected, g_sortedBy
+} from '../signals';
+
 function SideSpotify() {
-    const dispatch = useDispatch()
-    const { filterSelected, playlists } = useSelector(state => state.spotify)
 
     const filters = [
         { label: 'Recents', value: 'RECENTS' },
@@ -29,15 +29,15 @@ function SideSpotify() {
     }
 
     const handleFiltering = (filter) => {
-        dispatch(setFilterSelected(filter))
-        const res = filterBy(playlists.base, filter)
-        dispatch(setPlaylistsFiltered([...res]))
+        g_filterSelected.value = filter
+        const res = filterBy(g_playlists.value.base, filter)
+        g_playlists.value = { ...g_playlists.value, filtered: res }
     }
 
     const handleSortedByFilter = (e) => {
         const value = e.target.value
-        dispatch(setSortdBy(value))
-        let sorted = [...playlists.filtered]
+        g_sortedBy.value = value
+        let sorted = [...g_playlists.value.filtered]
         switch (value) {
             case 'RECENTS':
                 break;
@@ -52,18 +52,19 @@ function SideSpotify() {
             default:
                 break;
         }
-        dispatch(setPlaylistsFiltered([...sorted]))
+        g_playlists.value = { ...g_playlists.value, filtered: sorted }
     }
 
     const handleDelete = () => {
-        dispatch(setFilterSelected(null))
-        dispatch(setPlaylistsFiltered([...playlists.base]))
+        g_filterSelected.value = null
+        g_playlists.value = { ...g_playlists.value, filtered: g_playlists.value.base }
     };
 
     const filterBy = (playlistBase, filter) => playlistBase.filter((p) => p.type.value === filter)
 
     const handleSelectPlaylist = (playlist) => {
-        dispatch(setPlaylistSelected(playlist))
+        g_playlistSelected.value = playlist
+        localStorage.setItem('playlistSelected', JSON.stringify(playlist))
     }
 
     const renderPlaylists = (song, index) => {
@@ -127,20 +128,20 @@ function SideSpotify() {
         let res = []
         // Filter by Chip
         const lsFilteredBy = localStorage.getItem('filterSelected')
-        if (lsFilteredBy !== 'null' && lsFilteredBy && playlists.base) {
-            res = filterBy(playlists.base, lsFilteredBy)
-            dispatch(setPlaylistsFiltered([...res]))
+        if (lsFilteredBy !== 'null' && lsFilteredBy && g_playlists.value.base) {
+            res = filterBy(g_playlists.value.base, lsFilteredBy)
+            g_playlists.value = { ...g_playlists.value, filtered: res }
         }
         // Filter by Search
-        const _playlists = res.length > 0 ? [...res] : [...playlists.base]
+        const _playlists = res.length > 0 ? [...res] : [...g_playlists.value.base]
         res = _playlists.filter(pl => {
             const songName = pl.name.toUpperCase()
             const _searchInput = (searchInput.value).toUpperCase()
             return songName.includes(_searchInput)
         })
-        dispatch(setPlaylistsFiltered([...res]))
+        g_playlists.value = { ...g_playlists.value, filtered: res }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, playlists.base, searchInput.value])
+    }, [g_playlists.value.base, searchInput.value])
 
     return (
         <div className='side-spotify container-1'>
@@ -172,15 +173,15 @@ function SideSpotify() {
                 }}>
                     <Chip label="Playlists"
                         className='filter-badges'
-                        onDelete={filterSelected === 'PLAYLIST' || localStorage.getItem('filterSelected') === 'PLAYLIST' ? handleDelete : undefined}
+                        onDelete={g_filterSelected.value === 'PLAYLIST' || localStorage.getItem('filterSelected') === 'PLAYLIST' ? handleDelete : undefined}
                         onClick={() => handleFiltering('PLAYLIST')} />
                     <Chip label="Artists"
                         className='filter-badges'
-                        onDelete={filterSelected === 'ARTIST' || localStorage.getItem('filterSelected') === 'ARTIST' ? handleDelete : undefined}
+                        onDelete={g_filterSelected.value === 'ARTIST' || localStorage.getItem('filterSelected') === 'ARTIST' ? handleDelete : undefined}
                         onClick={() => handleFiltering('ARTIST')} />
                     <Chip label="Albums"
                         className='filter-badges'
-                        onDelete={filterSelected === 'ALBUM' || localStorage.getItem('filterSelected') === 'ALBUM' ? handleDelete : undefined}
+                        onDelete={g_filterSelected.value === 'ALBUM' || localStorage.getItem('filterSelected') === 'ALBUM' ? handleDelete : undefined}
                         onClick={() => handleFiltering('ALBUM')} />
                 </div>
             </div>
@@ -255,7 +256,7 @@ function SideSpotify() {
                         </Select>
                     </FormControl>
                 </div>
-                {playlists.filtered.length > 0 ? playlists.filtered.map((playlist, idx) => renderPlaylists(playlist, idx)) : renderKeywordWarning()}
+                {g_playlists.value.filtered.length > 0 ? g_playlists.value.filtered.map((playlist, idx) => renderPlaylists(playlist, idx)) : renderKeywordWarning()}
             </div>
         </div>
     )

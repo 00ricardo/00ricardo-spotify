@@ -27,6 +27,7 @@ function CustomButtonWrapper({ track_id }) {
                 tempArray[songIdx] = { ...tempArray[songIdx], saved: !song.saved };
             }
             g_spotifyMusicList.value = [...tempArray]
+            localStorage.setItem('spotifyMusicList', JSON.stringify([...tempArray]))
         }
     };
 

@@ -9,7 +9,6 @@ import { volumeValue } from '../signals';
 function PlayerSubControls() {
     const handleChange = (event, newValue) => {
         const audioVolume = document.getElementById('audio-element-controller')
-        console.log(newValue)
         audioVolume.volume = newValue
         volumeValue.value = newValue;
     };

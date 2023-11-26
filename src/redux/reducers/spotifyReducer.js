@@ -109,9 +109,7 @@ const setSongPlayingReducer = (state, action) => {
 
     localStorage.setItem('songPlaying', JSON.stringify(value))
   } catch (error) {
-    console.log(error)
   }
-
 }
 
 const setSongSelectedReducer = (state, action) => {

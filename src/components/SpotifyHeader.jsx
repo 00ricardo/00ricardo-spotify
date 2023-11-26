@@ -2,18 +2,14 @@ import React, { useEffect, Fragment } from 'react'
 import {
     Avatar
 } from '@mui/material';
-import { useSelector } from 'react-redux';
 import useImageColor from 'use-image-color'
-import { useDispatch } from 'react-redux';
-import { setGradientColor, setSpotifyMusicList, setPlaylistSelected } from '../redux/reducers/spotifyReducer';
 import playlistEndpoints from '../services/endpoints/plyalists';
 import { useQuery } from '@tanstack/react-query';
 import ricardoImg from '../public/img/00ricardo.jpg'
-import { gradientColor } from '../signals';
+import { g_gradientColor, g_playlistSelected, g_spotifyMusicList } from '../signals';
+import { batch } from '@preact/signals-react';
 function SpotifyHeader() {
-    const dispatch = useDispatch()
-    const { playlistSelected } = useSelector((state) => state.spotify)
-    const { id, name, owner, tracksReference, type, src, totalPlaylistDuration } = playlistSelected
+    const { id, name, owner, tracksReference, type, src, totalPlaylistDuration } = g_playlistSelected.value
     const authenticationSettings = JSON.parse(localStorage.getItem('authentication'))
     const { colors } = useImageColor(src, { cors: true, colors: 2 })
 
@@ -91,6 +87,7 @@ function SpotifyHeader() {
             const src = t.track.album.images[0]
             const trk = {
                 '#': i + 1,
+                id: i + 1,
                 track_id: track_id,
                 title: createTrackContent(src, false, name, artists),
                 name: name,
@@ -108,16 +105,18 @@ function SpotifyHeader() {
         const totalPlaylistDuration = tracks.reduce((acc, curr) => {
             return acc + curr.time
         }, 0)
-        dispatch(setPlaylistSelected({ ...playlistSelected, totalPlaylistDuration: totalPlaylistDuration }))
-        dispatch(setSpotifyMusicList(tracks))
+        batch(() => {
+            g_playlistSelected.value = { ...g_playlistSelected.value, totalPlaylistDuration: totalPlaylistDuration }
+            g_spotifyMusicList.value = tracks
+            localStorage.setItem('spotifyMusicList', JSON.stringify(tracks))
+        })
     }
 
     useEffect(() => {
         if (colors) {
-            dispatch(setGradientColor(colors))
-            gradientColor.value = colors
+            g_gradientColor.value = colors
         }
-    }, [dispatch, colors])
+    }, [colors])
 
     useQuery({
         queryKey: ['spotify-playlist', id],
@@ -126,7 +125,6 @@ function SpotifyHeader() {
         onSuccess: (data) => {
             const _data = { ...data }
             prepareData(_data)
-            console.log(data)
         }
     });
 
@@ -160,7 +158,7 @@ function SpotifyHeader() {
     return (
         <div id={id}
             className='header'
-            style={{ background: `linear-gradient(180deg, ${gradientColor.value[2]} 0%, ${gradientColor.value[1]} 100%, ${gradientColor.value[0]} 100%)` }}
+            style={{ background: `linear-gradient(180deg, ${g_gradientColor.value[2]} 0%, ${g_gradientColor.value[1]} 100%, ${g_gradientColor.value[0]} 100%)` }}
         >
             <Avatar
                 style={{

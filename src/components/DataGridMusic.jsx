@@ -4,7 +4,7 @@ import { AccessTime, Pause, PlayArrow } from '@mui/icons-material';
 import { Box, Avatar } from '@mui/material'
 import { Audio } from 'react-loader-spinner'
 import CustomButtonWrapper from './CustomSpotifyLikeWrapper';
-import { playingIconOnHover, g_spotifyMusicList, g_checkPreview, g_songPlaying } from '../signals';
+import { playingIconOnHover, g_spotifyMusicList, g_checkPreview, g_songPlaying, g_songSelected } from '../signals';
 import { batch } from '@preact/signals-react';
 
 export default function DataGridMusic() {
@@ -77,7 +77,6 @@ export default function DataGridMusic() {
     const createIdContent = (row) => {
         const songObj = { ...row?.row }
         const { id, track_id, isPlaying } = songObj
-
         return (
             <Box style={{ cursor: 'pointer' }}>
                 {!isPlaying && !playingIconOnHover.value[track_id] ? id
@@ -112,10 +111,10 @@ export default function DataGridMusic() {
         const updateSongSelected = { ...songObj }
         batch(() => {
             g_checkPreview.value = { song: updateSongSelected, check: true }
+            g_songSelected.value = { ...updateSongSelected, isPlaying: true }
             g_spotifyMusicList.value = newData
+            localStorage.setItem('spotifyMusicList', JSON.stringify(newData))
         })
-
-        g_spotifyMusicList.value = [...newData]
 
         const audio = document.getElementById('audio-element-controller')
         if (audio) audio.play()
@@ -128,11 +127,14 @@ export default function DataGridMusic() {
             d.isPlaying = false
             return d
         })
-        g_spotifyMusicList.value = [...newData]
         batch(() => {
             g_songPlaying.value = false
+            g_songSelected.value = { ...g_songSelected, isPlaying: false }
             g_spotifyMusicList.value = newData
         })
+        localStorage.setItem('spotifyMusicList', JSON.stringify(newData))
+        localStorage.setItem('songPlaying', JSON.stringify(false))
+
         const audio = document.getElementById('audio-element-controller')
         if (audio) audio.pause()
     }

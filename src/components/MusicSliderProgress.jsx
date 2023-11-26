@@ -48,7 +48,6 @@ const cssRules = {
     },
 }
 
-
 export default function MusicSliderProgress({ songTimeMax, stepper, handleSliderChange, formatTime }) {
     const handleMouseUp = (e, val) => {
         const minValue = 100 * 29 / songTimeMax

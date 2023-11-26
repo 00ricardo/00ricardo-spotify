@@ -21,56 +21,43 @@ export default function Player({ handleSliderChange }) {
         let nextSong = g_spotifyMusicList.value.find((song) => song['#'] === currentSong['#'] + 1)
         if (!nextSong) {
             nextSong = g_spotifyMusicList.value.find((song) => song['#'] === 1)
-            g_songPlaying.value = false
+            const newData = g_spotifyMusicList.value.map((d) => {
+                const obj = { ...d, isPlaying: false }
+                return obj
+            })
+
+            batch(() => {
+                g_songPlaying.value = false
+                g_songSelected.value = { ...nextSong, isPlaying: false }
+                g_spotifyMusicList.value = newData
+            })
+
+            localStorage.setItem('spotifyMusicList', JSON.stringify(newData))
+            localStorage.setItem('songPlaying', JSON.stringify(false))
         }
         g_checkPreview.value = { song: nextSong, check: true }
-
+        console.log(nextSong)
     }
 
     const runSongTimer = () => {
-        const stepper = 100 / songTimeMax;
+        let second_startingPoint = songTimeMax - 29 // 29 -> preview duration
+        const second_stepper = 1
+        let percentage_startingPoint = (second_startingPoint * 100) / songTimeMax
+        const percentage_stepper = 100 / songTimeMax;
         const timer = setInterval(() => {
-
-            // When song ends
-            songTime.value = (() => {
-                if (songTime.value === songTimeMax) {
-                    clearInterval(timer);
-                    batch(() => {
-                        timerRef.value = null;
-                        songTimeParser.value = '00:00';
-                        songTimeProgress.value = 0; // Reset progress
-                    })
-                    jumpToNextSong()
-                    return 0;
-                }
-
-                // Update song time and progress
-                const _oldTimer = songTime.value + (songTimeMax - 29) === songTimeMax - 29 ? songTimeMax - 29 : songTime.value + (songTimeMax - 29)
-
-                songTimeParser.value = (() => {
-                    if (songTimeParser.value === formatTime(songTimeMax)) {
-                        jumpToNextSong()
-                        return formatTime(0);
-                    }
-                    return formatTime(_oldTimer + 1)
-                });
-
-                songTimeProgress.value = (() => {
-                    //Jump to next Song
-                    if (songTimeProgress.value >= 100 || songTimeParser === formatTime(songTimeMax)) {
-                        jumpToNextSong()
-                        return 0
-                    } else {
-
-                        const _oldTimer = songTimeProgress.value + stepper === stepper ? ((songTimeMax - 29) * 100) / songTimeMax : songTimeProgress.value
-                        //console.log(_oldTimer + stepper)
-                        return _oldTimer + stepper
-                    }
-
-                });
-
-                return songTime.value + 1;
-            });
+            if (second_startingPoint === songTimeMax) {
+                console.log("Jump To Next Song...")
+                clearInterval(timer);
+                batch(() => {
+                    timerRef.value = null;
+                    songTimeParser.value = '00:00';
+                    songTimeProgress.value = 0; // Reset progress
+                })
+                jumpToNextSong()
+                return 0
+            } else {
+                second_startingPoint += second_stepper
+            }
         }, 1000);
         timerRef.value = timer;
     };
@@ -89,9 +76,9 @@ export default function Player({ handleSliderChange }) {
     const playOrPause = () => {
         const _data = [...g_spotifyMusicList.value]
         const audio = document.getElementById('audio-element-controller')
-        let newData = null
+        let newData = []
         if (g_songSelected.value.isPlaying) {
-            newData = _data.map((d, i) => {
+            newData = _data.map((d) => {
                 const obj = { ...d, isPlaying: false }
                 return obj
             })
@@ -99,14 +86,21 @@ export default function Player({ handleSliderChange }) {
 
         } else {
             const songIdx = g_songSelected.value['#']
-            const _songIdx = _data.findIndex((d, i) => d['#'] === songIdx)
+            const _songIdx = _data.findIndex((d) => d['#'] === songIdx)
             if (_songIdx !== -1) {
                 _data[_songIdx] = { ...g_songSelected.value, isPlaying: true }
             }
             newData = [..._data]
             if (audio) audio.play()
         }
-        g_songPlaying.value = !g_songSelected.value.isPlaying  // Play the song
+        batch(() => {
+            g_songPlaying.value = !g_songSelected.value.isPlaying  // Play the song
+            g_songSelected.value = { ...g_songSelected.value, isPlaying: !g_songSelected.value.isPlaying }
+            g_spotifyMusicList.value = newData
+        })
+        localStorage.setItem('spotifyMusicList', JSON.stringify(newData))
+        localStorage.setItem('songPlaying', JSON.stringify(!g_songSelected.value.isPlaying))
+
     };
 
     useEffect(() => {
@@ -127,13 +121,11 @@ export default function Player({ handleSliderChange }) {
                 runSongTimer();
             }
         } else {
-            if (g_songPlaying.value
-                && g_songSelected.value.isPlaying
-                && songTimeProgress === 0) runSongTimer();
+            if (g_songPlaying.value && g_songSelected.value.isPlaying && songTimeProgress.value === 0) {
+                runSongTimer();
+            }
         }
-
     }, [g_songPlaying.value, g_songSelected.value]);
-
 
     useEffect(() => {
         if (!g_songSelected.value.isPlaying && timerRef) {

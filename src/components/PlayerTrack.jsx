@@ -3,13 +3,8 @@ import { Avatar, } from '@mui/material';
 import { PictureInPictureAlt } from '@mui/icons-material';
 import SpotifyLike from '../public/lotties/spotify-like.json'
 import { Player as LootieLikeButton } from '@lottiefiles/react-lottie-player';
-import { useDispatch, useSelector } from 'react-redux';
-import { setSongSelected } from '../redux/reducers/spotifyReducer';
-import { end } from '../signals';
+import { end, g_songSelected, g_spotifyMusicList } from '../signals';
 function PlayerTrack() {
-    const { songSelected, spotifyMusicList } = useSelector((state) => state.spotify)
-
-    const dispatch = useDispatch()
     const lottieRef = useRef(null);
     const startLikeAnimation = () => {
         end.value = false
@@ -20,10 +15,9 @@ function PlayerTrack() {
             } else {
                 lottieRef.current.setSeeker(0);
             }
-            const _songSelected = { ...songSelected }
-            dispatch(setSongSelected({ ..._songSelected, saved: !_songSelected.saved }))
-            const tempArray = [...spotifyMusicList]
-            const songIdx = tempArray.findIndex((s, i) => s.track_id === _songSelected.track_id)
+            g_songSelected.value = { ...g_songSelected.value, saved: !g_songSelected.value.saved }
+            const tempArray = [...g_spotifyMusicList.value]
+            const songIdx = tempArray.findIndex((s, i) => s.track_id === g_songSelected.value.track_id)
             if (songIdx !== -1) {
                 tempArray[songIdx] = { ...tempArray[songIdx], saved: !tempArray[songIdx].saved };
             }
@@ -32,7 +26,7 @@ function PlayerTrack() {
     const handleEventPlayer = (e) => {
         //Check if the song is saved
         // If it is, then lottie should be animated (seeker 55)
-        if (songSelected && songSelected.saved && e === 'load') lottieRef.current.setSeeker(55);
+        if (g_songSelected.value && g_songSelected.value.saved && e === 'load') lottieRef.current.setSeeker(55);
         if (lottieRef.current && e === 'play') end.value = true
     };
 
@@ -56,13 +50,21 @@ function PlayerTrack() {
 
 
     useEffect(() => {
-        if (lottieRef.current) lottieRef.current.setSeeker(songSelected.saved ? 55 : 0);
-    }, [songSelected.saved])
+        if (lottieRef.current) lottieRef.current.setSeeker(g_songSelected.value.saved ? 55 : 0);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [g_songSelected.value.saved])
+
+    useEffect(() => {
+        if (!g_songSelected.value['#'] === null) {
+            console.log("xd")
+            g_songSelected.value = g_spotifyMusicList.value[0]
+        }
+    }, [])
 
 
     return (
-        Object.keys(songSelected).length !== 0
-        && spotifyMusicList.length !== 0
+        Object.keys(g_songSelected.value).length !== 0
+        && g_spotifyMusicList.value.length !== 0
         && <div className='pb1'>
             <Avatar
                 style={{
@@ -71,7 +73,7 @@ function PlayerTrack() {
                     borderRadius: '5px'
                 }}
                 variant='square'
-                src={songSelected.src.url}
+                src={g_songSelected.value.src.url}
             />
             <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div className='song'>
@@ -83,11 +85,11 @@ function PlayerTrack() {
                             rel="noreferrer"
                             href='https://ricardobriceno.netlify.app/'
                         >
-                            {songSelected.name}
+                            {g_songSelected.value.name}
                         </a>
                     </div>
                     <div style={{ fontSize: 'small', color: 'var(--spotify-grey)' }}>
-                        {songSelected.artists && transformArtistsData(songSelected.artists)}
+                        {g_songSelected.value.artists && transformArtistsData(g_songSelected.value.artists)}
                     </div>
                 </div>
                 <div className='song-like'>
