@@ -129,7 +129,7 @@ export default function DataGridMusic() {
         })
         batch(() => {
             g_songPlaying.value = false
-            g_songSelected.value = { ...g_songSelected, isPlaying: false }
+            g_songSelected.value = { ...g_songSelected.value, isPlaying: false }
             g_spotifyMusicList.value = newData
         })
         localStorage.setItem('spotifyMusicList', JSON.stringify(newData))

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
     PlayCircle,
     DownloadForOfflineOutlined,
@@ -152,24 +152,38 @@ function SpotifyControllers() {
         if (controllerEnd.value) lottieRef.current.setSeeker(55);
     })
 
+    useEffect(()=> {
+        if(g_songSelected.saved)  lottieRef.current.setSeeker(55)
+    },[])
+
     return (
         <div className='spotify-main-controlers'>
             <IconButton onClick={() => handleSong(g_songPlaying.value)}>
+            <div className='control-main-btn'>
                 {g_songPlaying.value ?
                     <PauseCircle
                         className='spotify-controller-icon'
                         sx={{ fontSize: 70 }}
                         fontSize='large'
                         style={{
+                            position:'absolute',
+                            bottom:'-15px',
+                            left:'-15px',
                             color: 'var(--spotify-green)'
-                        }} /> :
+                        }}/>:
+                      
                     <PlayCircle
                         className='spotify-controller-icon'
                         sx={{ fontSize: 70 }}
                         fontSize='large'
                         style={{
+                            position:'absolute',
+                            bottom:'-15px',
+                            left:'-15px',
                             color: 'var(--spotify-green)'
-                        }} />}
+                        }}/>
+                    }
+                     </div>
             </IconButton>
             <Tooltip title="Save to Your Library">
                 <IconButton className='like-btn' onClick={startLikeAnimation}>

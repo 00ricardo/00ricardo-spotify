@@ -16,11 +16,14 @@ function PlayerTrack() {
                 lottieRef.current.setSeeker(0);
             }
             g_songSelected.value = { ...g_songSelected.value, saved: !g_songSelected.value.saved }
+            console.log( g_songSelected.value)
             const tempArray = [...g_spotifyMusicList.value]
             const songIdx = tempArray.findIndex((s, i) => s.track_id === g_songSelected.value.track_id)
             if (songIdx !== -1) {
                 tempArray[songIdx] = { ...tempArray[songIdx], saved: !tempArray[songIdx].saved };
+                g_spotifyMusicList.value = tempArray
             }
+            
         }
     };
     const handleEventPlayer = (e) => {
@@ -56,7 +59,6 @@ function PlayerTrack() {
 
     useEffect(() => {
         if (!g_songSelected.value['#'] === null) {
-            console.log("xd")
             g_songSelected.value = g_spotifyMusicList.value[0]
         }
     }, [])
@@ -73,11 +75,10 @@ function PlayerTrack() {
                     borderRadius: '5px'
                 }}
                 variant='square'
-                src={g_songSelected.value.src.url}
+                src={g_songSelected.value.src?.url}
             />
             <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <div className='song'>
-
                     <div style={{ fontWeight: '400', color: 'var(--spotify-white)' }}>
                         <a
                             className='playlist-owner'

@@ -99,7 +99,10 @@ function SpotifyMusicList({ audioRef }) {
     }
 
     return (
-        <div id='audio-parent' className='spotify-container' style={{ color: 'white', background: `linear-gradient(180deg, ${g_gradientColor.value[1]} 0%, rgba(18, 18, 18, 1) 10%)` }}>
+        <div 
+            id='audio-parent' 
+            className='spotify-container' 
+            style={{ color: 'white', background: `linear-gradient(180deg, ${g_gradientColor.value[1]} 0%, rgba(18, 18, 18, 1) 50%)` }}>
             <SpotifyControllers />
             <DataGridMusic />
             {previewURL.value && <audio
